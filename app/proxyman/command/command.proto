@@ -11,7 +11,7 @@ import "common/serial/typed_message.proto";
 import "core/config.proto";
 
 message AddUserOperation {
-  xray.common.protocol.User user = 1;
+ repeated xray.common.protocol.User users = 1;
 }
 
 message RemoveUserOperation {
