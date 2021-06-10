@@ -2,9 +2,9 @@
 set -e
 ME=$(basename $0)
 auto_envsubst() {
-  local template_dir="${ENVSUBST_TEMPLATE_DIR:-/etc/trojan-go}"
+  local template_dir="${ENVSUBST_TEMPLATE_DIR:-/etc/xray}"
   local suffix="${ENVSUBST_TEMPLATE_SUFFIX:-.template}"
-  local output_dir="${ENVSUBST_OUTPUT_DIR:-/etc/trojan-go}"
+  local output_dir="${ENVSUBST_OUTPUT_DIR:-/etc/xray}"
 
   local template defined_envs relative_path output_path subdir
   defined_envs=$(printf '${%s} ' $(env | cut -d= -f1))
