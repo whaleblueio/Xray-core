@@ -140,7 +140,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	requestDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 
-		writer := buf.NewBufferedWriter(buf.NewWriter(conn))
+		writer := buf.NewBufferedWriter(buf.NewWriterWithRateLimiter(conn, request.User.SpeedLimiter.Speed))
 		if err := session.EncodeRequestHeader(request, writer); err != nil {
 			return newError("failed to encode request").Base(err).AtWarning()
 		}
@@ -174,7 +174,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	responseDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.UplinkOnly)
 
-		reader := &buf.BufferedReader{Reader: buf.NewReader(conn)}
+		reader := &buf.BufferedReader{Reader: buf.NewLimitReader(conn, request.User.SpeedLimiter.Speed)}
 		header, err := session.DecodeResponseHeader(reader)
 		if err != nil {
 			return newError("failed to read header").Base(err)

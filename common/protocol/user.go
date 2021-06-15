@@ -24,16 +24,18 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 		return nil, err
 	}
 	return &MemoryUser{
-		Account: account,
-		Email:   u.Email,
-		Level:   u.Level,
+		Account:      account,
+		SpeedLimiter: u.SpeedLimiter,
+		Email:        u.Email,
+		Level:        u.Level,
 	}, nil
 }
 
 // MemoryUser is a parsed form of User, to reduce number of parsing of Account proto.
 type MemoryUser struct {
 	// Account is the parsed account of the protocol.
-	Account Account
-	Email   string
-	Level   uint32
+	Account      Account
+	SpeedLimiter *SpeedLimiter
+	Email        string
+	Level        uint32
 }

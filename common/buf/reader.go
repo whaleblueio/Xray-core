@@ -1,10 +1,9 @@
 package buf
 
 import (
-	"io"
-
 	"github.com/xtls/xray-core/common"
 	"github.com/xtls/xray-core/common/errors"
+	"io"
 )
 
 func readOneUDP(r io.Reader) (*Buffer, error) {
