@@ -150,7 +150,7 @@ func file_common_protocol_server_spec_proto_init() {
 	if File_common_protocol_server_spec_proto != nil {
 		return
 	}
-	file_common_protocol_user_proto_init()
+	file_user_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_common_protocol_server_spec_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ServerEndpoint); i {
