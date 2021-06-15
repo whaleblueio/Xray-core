@@ -1,9 +1,9 @@
 module github.com/whaleblueio/Xray-core
 
 go 1.16
-replace (
-	github.com/whaleblueio/Xray-core => ./
-)
+
+replace github.com/whaleblueio/Xray-core => ./
+
 require (
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/golang/mock v1.5.0
@@ -19,7 +19,6 @@ require (
 	github.com/seiflotfy/cuckoofilter v0.0.0-20201222105146-bc6005554a0c
 	github.com/stretchr/testify v1.7.0
 	github.com/xtls/go v0.0.0-20201118062508-3632bf3b7499
-	github.com/whaleblueio/Xray-core v1.4.2
 	go.starlark.net v0.0.0-20210312235212-74c10e2c17dc
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/net v0.0.0-20210330230544-e57232859fb2
