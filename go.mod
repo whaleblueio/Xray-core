@@ -8,6 +8,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.5
 	github.com/gorilla/websocket v1.4.2
+	github.com/juju/ratelimit v1.0.1
 	github.com/lucas-clemente/quic-go v0.20.0
 	github.com/miekg/dns v1.1.41
 	github.com/pelletier/go-toml v1.8.1
@@ -21,8 +22,8 @@ require (
 	golang.org/x/net v0.0.0-20210330230544-e57232859fb2
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44
+	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
 	google.golang.org/grpc v1.36.1
-	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0 // indirect
 	google.golang.org/protobuf v1.26.0
 	h12.io/socks v1.0.2
 )

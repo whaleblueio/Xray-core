@@ -1,6 +1,7 @@
 package buf
 
 import (
+	rateLimit "github.com/juju/ratelimit"
 	"io"
 	"net"
 	"os"
@@ -45,6 +46,35 @@ func isPacketReader(reader io.Reader) bool {
 	return ok
 }
 
+func NewLimitReader(reader io.Reader, speed int64) Reader {
+	if mr, ok := reader.(Reader); ok {
+		return mr
+	}
+	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+	limitReader := rateLimit.Reader(reader, bucket)
+	if isPacketReader(reader) {
+		return &PacketReader{
+			Reader: limitReader,
+		}
+	}
+
+	_, isFile := reader.(*os.File)
+	if !isFile && useReadv {
+		if sc, ok := reader.(syscall.Conn); ok {
+			rawConn, err := sc.SyscallConn()
+			if err != nil {
+				newError("failed to get sysconn").Base(err).WriteToLog()
+			} else {
+				return NewReadVReader(limitReader, rawConn)
+			}
+		}
+	}
+
+	return &SingleReader{
+		Reader: limitReader,
+	}
+}
+
 // NewReader creates a new Reader.
 // The Reader instance doesn't take the ownership of reader.
 func NewReader(reader io.Reader) Reader {
@@ -80,9 +110,18 @@ func NewPacketReader(reader io.Reader) Reader {
 	if mr, ok := reader.(Reader); ok {
 		return mr
 	}
-
 	return &PacketReader{
 		Reader: reader,
+	}
+}
+func NewPacketReaderWithRateLimiter(reader io.Reader, speed int64) Reader {
+	if mr, ok := reader.(Reader); ok {
+		return mr
+	}
+	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+	limitReader := rateLimit.Reader(reader, bucket)
+	return &PacketReader{
+		Reader: limitReader,
 	}
 }
 
@@ -112,5 +151,23 @@ func NewWriter(writer io.Writer) Writer {
 
 	return &BufferToBytesWriter{
 		Writer: writer,
+	}
+}
+
+// NewWriter creates a new Writer.
+func NewWriterWithRateLimiter(writer io.Writer, speed int64) Writer {
+	if mw, ok := writer.(Writer); ok {
+		return mw
+	}
+	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+	limitWriter := rateLimit.Writer(writer, bucket)
+	if isPacketWriter(writer) {
+		return &SequentialWriter{
+			Writer: limitWriter,
+		}
+	}
+
+	return &BufferToBytesWriter{
+		Writer: limitWriter,
 	}
 }
