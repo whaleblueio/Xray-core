@@ -1,4 +1,4 @@
-module github.com/xtls/xray-core
+module github.com/whaleblueio/Xray-core
 
 go 1.16
 
