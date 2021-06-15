@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/buf"
-	"github.com/xtls/xray-core/common/serial"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/buf"
+	"github.com/whaleblueio/Xray-core/common/serial"
 )
 
 func TestUint16Serial(t *testing.T) {

@@ -2,8 +2,8 @@ package conf
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/xtls/xray-core/app/dns/fakedns"
-	"github.com/xtls/xray-core/features/dns"
+	"github.com/whaleblueio/Xray-core/app/dns/fakedns"
+	"github.com/whaleblueio/Xray-core/features/dns"
 )
 
 type FakeDNSConfig struct {

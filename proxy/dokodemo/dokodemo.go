@@ -1,24 +1,24 @@
 package dokodemo
 
-//go:generate go run github.com/xtls/xray-core/common/errors/errorgen
+//go:generate go run github.com/whaleblueio/Xray-core/common/errors/errorgen
 
 import (
 	"context"
 	"sync/atomic"
 	"time"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/buf"
-	"github.com/xtls/xray-core/common/log"
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/common/protocol"
-	"github.com/xtls/xray-core/common/session"
-	"github.com/xtls/xray-core/common/signal"
-	"github.com/xtls/xray-core/common/task"
-	"github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/features/policy"
-	"github.com/xtls/xray-core/features/routing"
-	"github.com/xtls/xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/buf"
+	"github.com/whaleblueio/Xray-core/common/log"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/common/protocol"
+	"github.com/whaleblueio/Xray-core/common/session"
+	"github.com/whaleblueio/Xray-core/common/signal"
+	"github.com/whaleblueio/Xray-core/common/task"
+	"github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/features/policy"
+	"github.com/whaleblueio/Xray-core/features/routing"
+	"github.com/whaleblueio/Xray-core/transport/internet"
 )
 
 func init() {

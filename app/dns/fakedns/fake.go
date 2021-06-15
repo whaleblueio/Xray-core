@@ -7,10 +7,10 @@ import (
 	gonet "net"
 	"time"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/cache"
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/features/dns"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/cache"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/features/dns"
 )
 
 type Holder struct {

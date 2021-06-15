@@ -1,17 +1,17 @@
 package inbound
 
-//go:generate go run github.com/xtls/xray-core/common/errors/errorgen
+//go:generate go run github.com/whaleblueio/Xray-core/common/errors/errorgen
 
 import (
 	"context"
 	"sync"
 
-	"github.com/xtls/xray-core/app/proxyman"
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/serial"
-	"github.com/xtls/xray-core/common/session"
-	"github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/features/inbound"
+	"github.com/whaleblueio/Xray-core/app/proxyman"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/serial"
+	"github.com/whaleblueio/Xray-core/common/session"
+	"github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/features/inbound"
 )
 
 // Manager is to manage all inbound handlers.

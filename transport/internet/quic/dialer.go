@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/lucas-clemente/quic-go"
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/common/task"
-	"github.com/xtls/xray-core/transport/internet"
-	"github.com/xtls/xray-core/transport/internet/tls"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/common/task"
+	"github.com/whaleblueio/Xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/transport/internet/tls"
 )
 
 type sessionContext struct {

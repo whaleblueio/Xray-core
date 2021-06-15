@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/xtls/xray-core/common"
-	. "github.com/xtls/xray-core/proxy/vmess/encoding"
+	"github.com/whaleblueio/Xray-core/common"
+	. "github.com/whaleblueio/Xray-core/proxy/vmess/encoding"
 )
 
 func TestFnvAuth(t *testing.T) {

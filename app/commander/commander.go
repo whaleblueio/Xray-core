@@ -1,6 +1,6 @@
 package commander
 
-//go:generate go run github.com/xtls/xray-core/common/errors/errorgen
+//go:generate go run github.com/whaleblueio/Xray-core/common/errors/errorgen
 
 import (
 	"context"
@@ -9,10 +9,10 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/signal/done"
-	core "github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/features/outbound"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/signal/done"
+	core "github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/features/outbound"
 )
 
 // Commander is a Xray feature that provides gRPC methods to external clients.

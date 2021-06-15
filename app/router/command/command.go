@@ -1,6 +1,6 @@
 package command
 
-//go:generate go run github.com/xtls/xray-core/common/errors/errorgen
+//go:generate go run github.com/whaleblueio/Xray-core/common/errors/errorgen
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/features/routing"
-	"github.com/xtls/xray-core/features/stats"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/features/routing"
+	"github.com/whaleblueio/Xray-core/features/stats"
 )
 
 // routingServer is an implementation of RoutingService.

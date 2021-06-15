@@ -10,15 +10,15 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/common/net/cnc"
-	http_proto "github.com/xtls/xray-core/common/protocol/http"
-	"github.com/xtls/xray-core/common/serial"
-	"github.com/xtls/xray-core/common/session"
-	"github.com/xtls/xray-core/common/signal/done"
-	"github.com/xtls/xray-core/transport/internet"
-	"github.com/xtls/xray-core/transport/internet/tls"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/common/net/cnc"
+	http_proto "github.com/whaleblueio/Xray-core/common/protocol/http"
+	"github.com/whaleblueio/Xray-core/common/serial"
+	"github.com/whaleblueio/Xray-core/common/session"
+	"github.com/whaleblueio/Xray-core/common/signal/done"
+	"github.com/whaleblueio/Xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/transport/internet/tls"
 )
 
 type Listener struct {

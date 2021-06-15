@@ -5,11 +5,11 @@ import (
 
 	grpc "google.golang.org/grpc"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/features/inbound"
-	"github.com/xtls/xray-core/features/outbound"
-	"github.com/xtls/xray-core/proxy"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/features/inbound"
+	"github.com/whaleblueio/Xray-core/features/outbound"
+	"github.com/whaleblueio/Xray-core/proxy"
 )
 
 // InboundOperation is the interface for operations that applies to inbound handlers.

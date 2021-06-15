@@ -1,4 +1,4 @@
-package uuid // import "github.com/xtls/xray-core/common/uuid"
+package uuid // import "github.com/whaleblueio/Xray-core/common/uuid"
 
 import (
 	"bytes"
@@ -6,8 +6,8 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/errors"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/errors"
 )
 
 var (

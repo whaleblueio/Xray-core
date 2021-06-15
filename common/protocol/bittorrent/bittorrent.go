@@ -3,7 +3,7 @@ package bittorrent
 import (
 	"errors"
 
-	"github.com/xtls/xray-core/common"
+	"github.com/whaleblueio/Xray-core/common"
 )
 
 type SniffHeader struct {

@@ -7,14 +7,14 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/common/buf"
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/common/net/cnc"
-	"github.com/xtls/xray-core/common/session"
-	"github.com/xtls/xray-core/transport/internet"
-	"github.com/xtls/xray-core/transport/internet/tls"
-	"github.com/xtls/xray-core/transport/pipe"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/common/buf"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/common/net/cnc"
+	"github.com/whaleblueio/Xray-core/common/session"
+	"github.com/whaleblueio/Xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/transport/internet/tls"
+	"github.com/whaleblueio/Xray-core/transport/pipe"
 	"golang.org/x/net/http2"
 )
 

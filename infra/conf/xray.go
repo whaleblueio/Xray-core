@@ -2,17 +2,17 @@ package conf
 
 import (
 	"encoding/json"
-	"github.com/xtls/xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/transport/internet"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/xtls/xray-core/app/dispatcher"
-	"github.com/xtls/xray-core/app/proxyman"
-	"github.com/xtls/xray-core/app/stats"
-	"github.com/xtls/xray-core/common/serial"
-	core "github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/transport/internet/xtls"
+	"github.com/whaleblueio/Xray-core/app/dispatcher"
+	"github.com/whaleblueio/Xray-core/app/proxyman"
+	"github.com/whaleblueio/Xray-core/app/stats"
+	"github.com/whaleblueio/Xray-core/common/serial"
+	core "github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/transport/internet/xtls"
 )
 
 var (

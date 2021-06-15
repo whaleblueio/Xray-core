@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/xtls/xray-core/common"
+	"github.com/whaleblueio/Xray-core/common"
 )
 
 func main() {

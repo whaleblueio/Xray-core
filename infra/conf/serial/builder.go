@@ -1,9 +1,9 @@
 package serial
 
 import (
-	"github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/infra/conf"
-	"github.com/xtls/xray-core/main/confloader"
+	"github.com/whaleblueio/Xray-core/core"
+	"github.com/whaleblueio/Xray-core/infra/conf"
+	"github.com/whaleblueio/Xray-core/main/confloader"
 	"io"
 )
 

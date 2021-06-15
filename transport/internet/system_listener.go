@@ -6,8 +6,8 @@ import (
 	"syscall"
 
 	"github.com/pires/go-proxyproto"
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/common/session"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/common/session"
 )
 
 var (

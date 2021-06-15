@@ -4,9 +4,9 @@ import (
 	"io"
 	"sync"
 
-	"github.com/xtls/xray-core/common/retry"
+	"github.com/whaleblueio/Xray-core/common/retry"
 
-	"github.com/xtls/xray-core/common/buf"
+	"github.com/whaleblueio/Xray-core/common/buf"
 )
 
 type SegmentWriter interface {

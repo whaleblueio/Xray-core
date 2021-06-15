@@ -9,12 +9,12 @@
 // connections.
 package core
 
-//go:generate go run github.com/xtls/xray-core/common/errors/errorgen
+//go:generate go run github.com/whaleblueio/Xray-core/common/errors/errorgen
 
 import (
 	"runtime"
 
-	"github.com/xtls/xray-core/common/serial"
+	"github.com/whaleblueio/Xray-core/common/serial"
 )
 
 var (

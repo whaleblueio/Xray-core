@@ -8,7 +8,7 @@ package freedom
 
 import (
 	proto "github.com/golang/protobuf/proto"
-	protocol "github.com/xtls/xray-core/common/protocol"
+	protocol "github.com/whaleblueio/Xray-core/common/protocol"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

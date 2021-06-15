@@ -8,11 +8,11 @@ import (
 
 	xtls "github.com/xtls/go"
 
-	"github.com/xtls/xray-core/common/net"
-	"github.com/xtls/xray-core/common/ocsp"
-	"github.com/xtls/xray-core/common/platform/filesystem"
-	"github.com/xtls/xray-core/common/protocol/tls/cert"
-	"github.com/xtls/xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/common/net"
+	"github.com/whaleblueio/Xray-core/common/ocsp"
+	"github.com/whaleblueio/Xray-core/common/platform/filesystem"
+	"github.com/whaleblueio/Xray-core/common/protocol/tls/cert"
+	"github.com/whaleblueio/Xray-core/transport/internet"
 )
 
 var (

@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/transport/internet"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/transport/internet"
 )
 
 const protocolName = "grpc"

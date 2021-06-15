@@ -1,6 +1,6 @@
 package dns
 
-import "github.com/xtls/xray-core/common/errors"
+import "github.com/whaleblueio/Xray-core/common/errors"
 
 type errPathObjHolder struct{}
 

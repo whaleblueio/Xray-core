@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/xtls/xray-core/app/dns"
-	"github.com/xtls/xray-core/common"
-	dns_feature "github.com/xtls/xray-core/features/dns"
+	. "github.com/whaleblueio/Xray-core/app/dns"
+	"github.com/whaleblueio/Xray-core/common"
+	dns_feature "github.com/whaleblueio/Xray-core/features/dns"
 )
 
 func TestLocalNameServer(t *testing.T) {

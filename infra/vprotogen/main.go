@@ -9,8 +9,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/xtls/xray-core/common"
-	"github.com/xtls/xray-core/core"
+	"github.com/whaleblueio/Xray-core/common"
+	"github.com/whaleblueio/Xray-core/core"
 )
 
 var directory = flag.String("pwd", "", "Working directory of Xray vprotogen.")
