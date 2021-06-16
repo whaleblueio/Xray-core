@@ -142,9 +142,9 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 	}
 	var speed int64 = 0
 	if user != nil {
-		if user.SpeedLimiter != nil {
+		if user.SpeedLimiter != nil && user.SpeedLimiter.Speed != -1 {
 			speed = user.SpeedLimiter.Speed
-			logger.Infof("getLink() user:%s speed limit :%d  ", user.SpeedLimiter.Speed)
+			logger.Infof("getLink() user:%s speed limit :%d  ", user.Account, user.SpeedLimiter.Speed)
 		} else {
 			logger.Debugf("getLink() user:%s SpeedLimiter is nil ", user.Account)
 		}
