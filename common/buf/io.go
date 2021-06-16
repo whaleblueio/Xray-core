@@ -169,18 +169,30 @@ func NewWriterWithRateLimiter(writer io.Writer, speed int64) Writer {
 		})
 		return mw
 	}
-	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
-	limitWriter := rateLimit.Writer(writer, bucket)
+	if speed > 0 {
+		bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+		limitWriter := rateLimit.Writer(writer, bucket)
+		if isPacketWriter(writer) {
+			return &SequentialWriter{
+				Writer: limitWriter,
+			}
+		}
+
+		return &BufferToBytesWriter{
+			Writer: limitWriter,
+		}
+	}
+
 	log.Record(&log.GeneralMessage{
 		Content: "NewWriterWithRateLimiter() is rate limit writer",
 	})
 	if isPacketWriter(writer) {
 		return &SequentialWriter{
-			Writer: limitWriter,
+			Writer: writer,
 		}
 	}
 
 	return &BufferToBytesWriter{
-		Writer: limitWriter,
+		Writer: writer,
 	}
 }
