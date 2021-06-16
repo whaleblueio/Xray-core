@@ -3,6 +3,7 @@ package buf
 import (
 	rateLimit "github.com/juju/ratelimit"
 	logger "github.com/sirupsen/logrus"
+	"github.com/whaleblueio/Xray-core/common/log"
 	"io"
 	"net"
 	"os"
@@ -49,7 +50,10 @@ func isPacketReader(reader io.Reader) bool {
 
 func NewLimitReader(reader io.Reader, speed int64) Reader {
 	if mr, ok := reader.(Reader); ok {
-		logger.Infof("NewLimitReader() is multiple Reader")
+
+		log.Record(&log.GeneralMessage{
+			Content: "NewLimitReader() is multiple Reader",
+		})
 		return mr
 	}
 	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
@@ -160,12 +164,16 @@ func NewWriter(writer io.Writer) Writer {
 // NewWriter creates a new Writer.
 func NewWriterWithRateLimiter(writer io.Writer, speed int64) Writer {
 	if mw, ok := writer.(Writer); ok {
-		logger.Infof("NewWriterWithRateLimiter() is multiple writer")
+		log.Record(&log.GeneralMessage{
+			Content: "NewWriterWithRateLimiter() is multiple writer",
+		})
 		return mw
 	}
 	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
 	limitWriter := rateLimit.Writer(writer, bucket)
-	logger.Infof("NewWriterWithRateLimiter() is rate limit writer")
+	log.Record(&log.GeneralMessage{
+		Content: "NewWriterWithRateLimiter() is rate limit writer",
+	})
 	if isPacketWriter(writer) {
 		return &SequentialWriter{
 			Writer: limitWriter,
