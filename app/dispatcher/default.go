@@ -140,7 +140,7 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 		user = sessionInbound.User
 	}
 	var speed int64 = 0
-	if user != nil {
+	if user != nil && user.SpeedLimiter != nil {
 		speed = user.SpeedLimiter.Speed
 	}
 	inboundLink := &transport.Link{
