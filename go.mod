@@ -17,6 +17,7 @@ require (
 	github.com/pires/go-proxyproto v0.5.0
 	github.com/refraction-networking/utls v0.0.0-20201210053706-2179f286686b
 	github.com/seiflotfy/cuckoofilter v0.0.0-20201222105146-bc6005554a0c
+	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/xtls/go v0.0.0-20201118062508-3632bf3b7499
 	go.starlark.net v0.0.0-20210312235212-74c10e2c17dc

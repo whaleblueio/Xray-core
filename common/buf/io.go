@@ -2,6 +2,7 @@ package buf
 
 import (
 	rateLimit "github.com/juju/ratelimit"
+	logger "github.com/sirupsen/logrus"
 	"io"
 	"net"
 	"os"
@@ -48,10 +49,12 @@ func isPacketReader(reader io.Reader) bool {
 
 func NewLimitReader(reader io.Reader, speed int64) Reader {
 	if mr, ok := reader.(Reader); ok {
+		logger.Infof("NewLimitReader() is multiple Reader")
 		return mr
 	}
 	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
 	limitReader := rateLimit.Reader(reader, bucket)
+	logger.Infof("NewLimitReader() is rate limit Reader")
 	if isPacketReader(reader) {
 		return &PacketReader{
 			Reader: limitReader,
@@ -157,10 +160,12 @@ func NewWriter(writer io.Writer) Writer {
 // NewWriter creates a new Writer.
 func NewWriterWithRateLimiter(writer io.Writer, speed int64) Writer {
 	if mw, ok := writer.(Writer); ok {
+		logger.Infof("NewWriterWithRateLimiter() is multiple writer")
 		return mw
 	}
 	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
 	limitWriter := rateLimit.Writer(writer, bucket)
+	logger.Infof("NewWriterWithRateLimiter() is rate limit writer")
 	if isPacketWriter(writer) {
 		return &SequentialWriter{
 			Writer: limitWriter,
