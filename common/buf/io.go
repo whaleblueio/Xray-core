@@ -2,7 +2,6 @@ package buf
 
 import (
 	rateLimit "github.com/juju/ratelimit"
-	logger "github.com/sirupsen/logrus"
 	"github.com/whaleblueio/Xray-core/common/log"
 	"io"
 	"net"
@@ -56,12 +55,35 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 		})
 		return mr
 	}
-	bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
-	limitReader := rateLimit.Reader(reader, bucket)
-	logger.Infof("NewLimitReader() is rate limit Reader")
+	if speed > 0 {
+		bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+		limitReader := rateLimit.Reader(reader, bucket)
+		if isPacketReader(reader) {
+			return &PacketReader{
+				Reader: limitReader,
+			}
+		}
+
+		_, isFile := reader.(*os.File)
+		if !isFile && useReadv {
+			if sc, ok := reader.(syscall.Conn); ok {
+				rawConn, err := sc.SyscallConn()
+				if err != nil {
+					newError("failed to get sysconn").Base(err).WriteToLog()
+				} else {
+					return NewReadVReader(limitReader, rawConn)
+				}
+			}
+		}
+
+		return &SingleReader{
+			Reader: limitReader,
+		}
+	}
+
 	if isPacketReader(reader) {
 		return &PacketReader{
-			Reader: limitReader,
+			Reader: reader,
 		}
 	}
 
@@ -72,13 +94,13 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 			if err != nil {
 				newError("failed to get sysconn").Base(err).WriteToLog()
 			} else {
-				return NewReadVReader(limitReader, rawConn)
+				return NewReadVReader(reader, rawConn)
 			}
 		}
 	}
 
 	return &SingleReader{
-		Reader: limitReader,
+		Reader: reader,
 	}
 }
 
