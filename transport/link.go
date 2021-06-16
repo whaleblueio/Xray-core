@@ -6,4 +6,5 @@ import "github.com/whaleblueio/Xray-core/common/buf"
 type Link struct {
 	Reader buf.Reader
 	Writer buf.Writer
+	Speed  int64
 }

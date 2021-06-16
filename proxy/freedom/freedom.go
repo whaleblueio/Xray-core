@@ -157,7 +157,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var writer buf.Writer
 		if destination.Network == net.Network_TCP {
-			writer = buf.NewWriter(conn)
+			writer = buf.NewWriterWithRateLimiter(conn, link.Speed)
 		} else {
 			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
 		}
@@ -174,7 +174,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
-			reader = buf.NewReader(conn)
+			reader = buf.NewLimitReader(conn, link.Speed)
 		} else {
 			reader = NewPacketReader(conn, UDPOverride)
 		}

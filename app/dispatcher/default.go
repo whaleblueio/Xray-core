@@ -134,21 +134,25 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 	opt := pipe.OptionsFromContext(ctx)
 	uplinkReader, uplinkWriter := pipe.New(opt...)
 	downlinkReader, downlinkWriter := pipe.New(opt...)
-
+	sessionInbound := session.InboundFromContext(ctx)
+	var user *protocol.MemoryUser
+	if sessionInbound != nil {
+		user = sessionInbound.User
+	}
+	var speed int64 = 0
+	if user != nil {
+		speed = user.SpeedLimiter.Speed
+	}
 	inboundLink := &transport.Link{
 		Reader: downlinkReader,
 		Writer: uplinkWriter,
+		Speed:  speed,
 	}
 
 	outboundLink := &transport.Link{
 		Reader: uplinkReader,
 		Writer: downlinkWriter,
-	}
-
-	sessionInbound := session.InboundFromContext(ctx)
-	var user *protocol.MemoryUser
-	if sessionInbound != nil {
-		user = sessionInbound.User
+		Speed:  speed,
 	}
 
 	if user != nil && len(user.Email) > 0 {
