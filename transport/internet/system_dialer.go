@@ -108,7 +108,7 @@ func (d *DefaultSystemDialer) redirect(ctx context.Context, dst net.Destination,
 		ur, uw := pipe.New(pipe.OptionsFromContext(ctx)...)
 		dr, dw := pipe.New(pipe.OptionsFromContext(ctx)...)
 
-		go h.Dispatch(ctx, &transport.Link{ur, dw})
+		go h.Dispatch(ctx, &transport.Link{Reader: ur, Writer: dw})
 		nc := cnc.NewConnection(
 			cnc.ConnectionInputMulti(uw),
 			cnc.ConnectionOutputMulti(dr),
