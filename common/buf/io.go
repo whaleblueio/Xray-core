@@ -58,6 +58,7 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 	if speed > 0 {
 		bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
 		limitReader := rateLimit.Reader(reader, bucket)
+
 		if isPacketReader(reader) {
 			return &PacketReader{
 				Reader: limitReader,

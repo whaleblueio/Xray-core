@@ -4,6 +4,7 @@ package dispatcher
 
 import (
 	"context"
+	logger "github.com/sirupsen/logrus"
 	"strings"
 	"sync"
 	"time"
@@ -140,8 +141,15 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 		user = sessionInbound.User
 	}
 	var speed int64 = 0
-	if user != nil && user.SpeedLimiter != nil {
-		speed = user.SpeedLimiter.Speed
+	if user != nil {
+		if user.SpeedLimiter != nil {
+			speed = user.SpeedLimiter.Speed
+			logger.Infof("getLink() user:%s speed limit :%d  ", user.SpeedLimiter.Speed)
+		} else {
+			logger.Debugf("getLink() user:%s SpeedLimiter is nil ", user.Account)
+		}
+	} else {
+		logger.Debug("getLink() user is nil ")
 	}
 	inboundLink := &transport.Link{
 		Reader: downlinkReader,
