@@ -110,7 +110,7 @@ func SplitBytes(mb MultiBuffer, b []byte) (MultiBuffer, int) {
 		}
 		pBuffer.Release()
 		mb[i] = nil
-		//bucket.Wait(int64(nBytes))
+
 	}
 
 	if endIndex == -1 {
@@ -203,8 +203,6 @@ func SplitSize(mb MultiBuffer, size int32) (MultiBuffer, MultiBuffer) {
 	return mb, r
 }
 
-//var bucket *ratelimit.Bucket = ratelimit.NewBucketWithQuantum(time.Second, 262144, 262144)
-
 // WriteMultiBuffer writes all buffers from the MultiBuffer to the Writer one by one, and return error if any, with leftover MultiBuffer.
 func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
 	for {
@@ -219,7 +217,6 @@ func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
 		if err != nil {
 			return mb, err
 		}
-		//bucket.Wait(int64(b.Len()))
 	}
 
 	return nil, nil
