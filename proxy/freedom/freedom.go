@@ -5,6 +5,7 @@ package freedom
 import (
 	"context"
 	"fmt"
+	rateLimit "github.com/juju/ratelimit"
 	"time"
 
 	"github.com/whaleblueio/Xray-core/common"
@@ -156,9 +157,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	var speed int64 = 0
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		speed = user.SpeedLimiter.Speed
-		newError(fmt.Sprintf("user:%s speed limit:%d", user.Account, speed)).WriteToLog()
-	} else {
-		newError(fmt.Sprintf("user:%s speed limit:%d", user.Account, speed)).WriteToLog()
+		newError(fmt.Sprintf("user:%s speed limit:%d", user.Email, speed)).WriteToLog(session.ExportIDToError(ctx))
 	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
@@ -265,6 +264,33 @@ func NewPacketWriter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride
 	}
 	return &buf.SequentialWriter{Writer: conn}
 }
+func NewPacketWriterWithRateLimiter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination, speed int64) buf.Writer {
+	iConn := conn
+	statConn, ok := iConn.(*internet.StatCouterConnection)
+	if ok {
+		iConn = statConn.Connection
+	}
+	var counter stats.Counter
+	if statConn != nil {
+		counter = statConn.WriteCounter
+	}
+	var bucket *rateLimit.Bucket
+	if speed > 0 {
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+	}
+
+	if c, ok := iConn.(*internet.PacketConnWrapper); ok {
+		return &PacketWriter{
+			PacketConnWrapper: c,
+			Counter:           counter,
+			Handler:           h,
+			Context:           ctx,
+			UDPOverride:       UDPOverride,
+			Bucket:            bucket,
+		}
+	}
+	return &buf.SequentialWriter{Writer: conn}
+}
 
 type PacketWriter struct {
 	*internet.PacketConnWrapper
@@ -272,6 +298,7 @@ type PacketWriter struct {
 	*Handler
 	context.Context
 	UDPOverride net.Destination
+	Bucket      *rateLimit.Bucket
 }
 
 func (w *PacketWriter) WriteMultiBuffer(mb buf.MultiBuffer) error {
@@ -309,6 +336,9 @@ func (w *PacketWriter) WriteMultiBuffer(mb buf.MultiBuffer) error {
 		if err != nil {
 			buf.ReleaseMulti(mb)
 			return err
+		}
+		if w.Bucket != nil {
+			w.Bucket.Wait(int64(n))
 		}
 		if w.Counter != nil {
 			w.Counter.Add(int64(n))
