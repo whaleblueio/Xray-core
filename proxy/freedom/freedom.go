@@ -166,7 +166,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if destination.Network == net.Network_TCP {
 			writer = buf.NewWriterWithRateLimiter(conn, speed)
 		} else {
-			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
+			writer = NewPacketWriterWithRateLimiter(conn, h, ctx, UDPOverride, speed)
 		}
 
 		if err := buf.Copy(input, writer, buf.UpdateActivity(timer)); err != nil {
@@ -183,7 +183,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if destination.Network == net.Network_TCP {
 			reader = buf.NewLimitReader(conn, speed)
 		} else {
-			reader = NewPacketReader(conn, UDPOverride)
+			reader = NewPacketReaderWithRateLimiter(conn, UDPOverride, speed)
 		}
 		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
@@ -218,9 +218,35 @@ func NewPacketReader(conn net.Conn, UDPOverride net.Destination) buf.Reader {
 	return &buf.PacketReader{Reader: conn}
 }
 
+func NewPacketReaderWithRateLimiter(conn net.Conn, UDPOverride net.Destination, speed int64) buf.Reader {
+	iConn := conn
+	statConn, ok := iConn.(*internet.StatCouterConnection)
+	if ok {
+		iConn = statConn.Connection
+	}
+	var counter stats.Counter
+	if statConn != nil {
+		counter = statConn.ReadCounter
+	}
+	var bucket *rateLimit.Bucket
+	if speed > 0 {
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
+	}
+	if c, ok := iConn.(*internet.PacketConnWrapper); ok && UDPOverride.Address == nil && UDPOverride.Port == 0 {
+		return &PacketReader{
+			PacketConnWrapper: c,
+			Counter:           counter,
+			Bucket:            bucket,
+		}
+	}
+	//return &buf.PacketReader{Reader: conn}
+	return buf.NewPacketReaderWithRateLimiter(conn, speed)
+}
+
 type PacketReader struct {
 	*internet.PacketConnWrapper
 	stats.Counter
+	Bucket *rateLimit.Bucket
 }
 
 func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
