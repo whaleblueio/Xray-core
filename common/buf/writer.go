@@ -222,6 +222,9 @@ type SequentialWriter struct {
 // WriteMultiBuffer implements Writer.
 func (w *SequentialWriter) WriteMultiBuffer(mb MultiBuffer) error {
 	mb, err := WriteMultiBuffer(w.Writer, mb)
+	if w.Bucket != nil {
+		w.Bucket.Wait(int64(mb.Len()))
+	}
 	ReleaseMulti(mb)
 	return err
 }
