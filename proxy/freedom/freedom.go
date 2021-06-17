@@ -263,6 +263,9 @@ func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 		Port:    net.Port(d.(*net.UDPAddr).Port),
 		Network: net.Network_UDP,
 	}
+	if r.Bucket != nil {
+		r.Bucket.Wait(int64(n))
+	}
 	if r.Counter != nil {
 		r.Counter.Add(int64(n))
 	}
