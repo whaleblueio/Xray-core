@@ -1,13 +1,10 @@
 package buf
 
 import (
-	"github.com/juju/ratelimit"
-	"io"
-	"time"
-
 	"github.com/whaleblueio/Xray-core/common"
 	"github.com/whaleblueio/Xray-core/common/errors"
 	"github.com/whaleblueio/Xray-core/common/serial"
+	"io"
 )
 
 // ReadAllToBytes reads all content from the reader into a byte array, until EOF.
@@ -113,7 +110,7 @@ func SplitBytes(mb MultiBuffer, b []byte) (MultiBuffer, int) {
 		}
 		pBuffer.Release()
 		mb[i] = nil
-		bucket.Wait(int64(nBytes))
+		//bucket.Wait(int64(nBytes))
 	}
 
 	if endIndex == -1 {
@@ -206,7 +203,7 @@ func SplitSize(mb MultiBuffer, size int32) (MultiBuffer, MultiBuffer) {
 	return mb, r
 }
 
-var bucket *ratelimit.Bucket = ratelimit.NewBucketWithQuantum(time.Second, 262144, 262144)
+//var bucket *ratelimit.Bucket = ratelimit.NewBucketWithQuantum(time.Second, 262144, 262144)
 
 // WriteMultiBuffer writes all buffers from the MultiBuffer to the Writer one by one, and return error if any, with leftover MultiBuffer.
 func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
@@ -222,7 +219,7 @@ func WriteMultiBuffer(writer io.Writer, mb MultiBuffer) (MultiBuffer, error) {
 		if err != nil {
 			return mb, err
 		}
-		bucket.Wait(int64(b.Len()))
+		//bucket.Wait(int64(b.Len()))
 	}
 
 	return nil, nil
