@@ -148,12 +148,13 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	if err != nil {
 		return newError("failed to open connection to ", destination).Base(err)
 	}
-	defer conn.Close()
 
+	defer conn.Close()
 	plcy := h.policy()
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
 	user := session.InboundFromContext(ctx).User
+	newError(fmt.Sprintf("User:%s connected to %s", user.Email, destination)).WriteToLog(session.ExportIDToError(ctx))
 	var speed int64 = 0
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		speed = user.SpeedLimiter.Speed
@@ -199,24 +200,24 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	return nil
 }
 
-func NewPacketReader(conn net.Conn, UDPOverride net.Destination) buf.Reader {
-	iConn := conn
-	statConn, ok := iConn.(*internet.StatCouterConnection)
-	if ok {
-		iConn = statConn.Connection
-	}
-	var counter stats.Counter
-	if statConn != nil {
-		counter = statConn.ReadCounter
-	}
-	if c, ok := iConn.(*internet.PacketConnWrapper); ok && UDPOverride.Address == nil && UDPOverride.Port == 0 {
-		return &PacketReader{
-			PacketConnWrapper: c,
-			Counter:           counter,
-		}
-	}
-	return &buf.PacketReader{Reader: conn}
-}
+//func NewPacketReader(conn net.Conn, UDPOverride net.Destination) buf.Reader {
+//	iConn := conn
+//	statConn, ok := iConn.(*internet.StatCouterConnection)
+//	if ok {
+//		iConn = statConn.Connection
+//	}
+//	var counter stats.Counter
+//	if statConn != nil {
+//		counter = statConn.ReadCounter
+//	}
+//	if c, ok := iConn.(*internet.PacketConnWrapper); ok && UDPOverride.Address == nil && UDPOverride.Port == 0 {
+//		return &PacketReader{
+//			PacketConnWrapper: c,
+//			Counter:           counter,
+//		}
+//	}
+//	return &buf.PacketReader{Reader: conn}
+//}
 
 func NewPacketReaderWithRateLimiter(conn net.Conn, UDPOverride net.Destination, speed int64) buf.Reader {
 	iConn := conn
@@ -272,27 +273,27 @@ func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 	return buf.MultiBuffer{b}, nil
 }
 
-func NewPacketWriter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination) buf.Writer {
-	iConn := conn
-	statConn, ok := iConn.(*internet.StatCouterConnection)
-	if ok {
-		iConn = statConn.Connection
-	}
-	var counter stats.Counter
-	if statConn != nil {
-		counter = statConn.WriteCounter
-	}
-	if c, ok := iConn.(*internet.PacketConnWrapper); ok {
-		return &PacketWriter{
-			PacketConnWrapper: c,
-			Counter:           counter,
-			Handler:           h,
-			Context:           ctx,
-			UDPOverride:       UDPOverride,
-		}
-	}
-	return &buf.SequentialWriter{Writer: conn}
-}
+//func NewPacketWriter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination) buf.Writer {
+//	iConn := conn
+//	statConn, ok := iConn.(*internet.StatCouterConnection)
+//	if ok {
+//		iConn = statConn.Connection
+//	}
+//	var counter stats.Counter
+//	if statConn != nil {
+//		counter = statConn.WriteCounter
+//	}
+//	if c, ok := iConn.(*internet.PacketConnWrapper); ok {
+//		return &PacketWriter{
+//			PacketConnWrapper: c,
+//			Counter:           counter,
+//			Handler:           h,
+//			Context:           ctx,
+//			UDPOverride:       UDPOverride,
+//		}
+//	}
+//	return &buf.SequentialWriter{Writer: conn}
+//}
 func NewPacketWriterWithRateLimiter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination, speed int64) buf.Writer {
 	iConn := conn
 	statConn, ok := iConn.(*internet.StatCouterConnection)
@@ -318,7 +319,7 @@ func NewPacketWriterWithRateLimiter(conn net.Conn, h *Handler, ctx context.Conte
 			Bucket:            bucket,
 		}
 	}
-	return &buf.SequentialWriter{Writer: conn}
+	return &buf.SequentialWriter{Writer: conn, Bucket: bucket}
 }
 
 type PacketWriter struct {

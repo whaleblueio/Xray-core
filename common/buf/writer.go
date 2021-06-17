@@ -1,6 +1,7 @@
 package buf
 
 import (
+	"github.com/juju/ratelimit"
 	"io"
 	"net"
 	"sync"
@@ -215,6 +216,7 @@ func (w *BufferedWriter) Close() error {
 // SequentialWriter is a Writer that writes MultiBuffer sequentially into the underlying io.Writer.
 type SequentialWriter struct {
 	io.Writer
+	Bucket *ratelimit.Bucket
 }
 
 // WriteMultiBuffer implements Writer.
