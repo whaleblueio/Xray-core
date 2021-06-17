@@ -4,8 +4,6 @@ package dispatcher
 
 import (
 	"context"
-	rateLimit "github.com/juju/ratelimit"
-	logger "github.com/sirupsen/logrus"
 	"strings"
 	"sync"
 	"time"
@@ -141,34 +139,17 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 	if sessionInbound != nil {
 		user = sessionInbound.User
 	}
-	var speed int64 = 0
-	if user != nil {
-		if user.SpeedLimiter != nil && user.SpeedLimiter.Speed != -1 {
-			speed = user.SpeedLimiter.Speed
-			logger.Infof("getLink() user:%s speed limit :%d  ", user.Account, user.SpeedLimiter.Speed)
-		} else {
-			logger.Debugf("getLink() user:%s SpeedLimiter is nil ", user.Account)
-		}
-	} else {
-		logger.Debug("getLink() user is nil ")
-	}
 	inboundLink := &transport.Link{
 		Reader: downlinkReader,
 		Writer: uplinkWriter,
-		Speed:  speed,
 	}
 
 	outboundLink := &transport.Link{
 		Reader: uplinkReader,
 		Writer: downlinkWriter,
-		Speed:  speed,
 	}
 
 	if user != nil && len(user.Email) > 0 {
-		var bucket *rateLimit.Bucket = nil
-		if user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
-			bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
-		}
 		p := d.policy.ForLevel(user.Level)
 
 		if p.Stats.UserUplink {
@@ -177,7 +158,6 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 				inboundLink.Writer = &SizeStatWriter{
 					Counter: c,
 					Writer:  inboundLink.Writer,
-					Bucket:  bucket,
 				}
 			}
 		}
@@ -187,7 +167,6 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 				outboundLink.Writer = &SizeStatWriter{
 					Counter: c,
 					Writer:  outboundLink.Writer,
-					Bucket:  bucket,
 				}
 			}
 		}

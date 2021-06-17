@@ -1,7 +1,6 @@
 package buf
 
 import (
-	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"github.com/whaleblueio/Xray-core/common/log"
 	"io"
@@ -206,10 +205,6 @@ func NewWriterWithRateLimiter(writer io.Writer, speed int64) Writer {
 			Writer: limitWriter,
 		}
 	}
-
-	log.Record(&log.GeneralMessage{
-		Content: fmt.Sprintf("NewWriterWithRateLimiter() is rate limit writer,speed:%d", speed),
-	})
 	if isPacketWriter(writer) {
 		return &SequentialWriter{
 			Writer: writer,

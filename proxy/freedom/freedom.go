@@ -4,6 +4,7 @@ package freedom
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/whaleblueio/Xray-core/common"
@@ -151,13 +152,20 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	plcy := h.policy()
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
-
+	user := session.InboundFromContext(ctx).User
+	var speed int64 = 0
+	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
+		speed = user.SpeedLimiter.Speed
+		newError(fmt.Sprintf("user:%s speed limit:%d", user.Account, speed)).WriteToLog()
+	} else {
+		newError(fmt.Sprintf("user:%s speed limit:%d", user.Account, speed)).WriteToLog()
+	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 
 		var writer buf.Writer
 		if destination.Network == net.Network_TCP {
-			writer = buf.NewWriterWithRateLimiter(conn, link.Speed)
+			writer = buf.NewWriterWithRateLimiter(conn, speed)
 		} else {
 			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
 		}
@@ -174,7 +182,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
-			reader = buf.NewLimitReader(conn, link.Speed)
+			reader = buf.NewLimitReader(conn, speed)
 		} else {
 			reader = NewPacketReader(conn, UDPOverride)
 		}

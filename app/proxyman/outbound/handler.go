@@ -2,8 +2,6 @@ package outbound
 
 import (
 	"context"
-	logger "github.com/sirupsen/logrus"
-
 	"github.com/whaleblueio/Xray-core/app/proxyman"
 	"github.com/whaleblueio/Xray-core/common"
 	"github.com/whaleblueio/Xray-core/common/mux"
@@ -171,18 +169,9 @@ func (h *Handler) Dial(ctx context.Context, dest net.Destination) (internet.Conn
 				})
 
 				opts := pipe.OptionsFromContext(ctx)
-				sessionInbound := session.InboundFromContext(ctx)
 				uplinkReader, uplinkWriter := pipe.New(opts...)
 				downlinkReader, downlinkWriter := pipe.New(opts...)
-				var speed int64 = 0
-				if sessionInbound != nil {
-					if sessionInbound.User != nil {
-						speed = sessionInbound.User.SpeedLimiter.Speed
-					}
-				} else {
-					logger.Debug("sessionInbound is nil,")
-				}
-				go handler.Dispatch(ctx, &transport.Link{Reader: uplinkReader, Writer: downlinkWriter, Speed: speed})
+				go handler.Dispatch(ctx, &transport.Link{Reader: uplinkReader, Writer: downlinkWriter})
 				conn := cnc.NewConnection(cnc.ConnectionInputMulti(uplinkWriter), cnc.ConnectionOutputMulti(downlinkReader))
 
 				if config := tls.ConfigFromStreamSettings(h.streamSettings); config != nil {
