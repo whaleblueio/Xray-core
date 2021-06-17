@@ -166,7 +166,7 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 
 	if user != nil && len(user.Email) > 0 {
 		var bucket *rateLimit.Bucket = nil
-		if user.SpeedLimiter != nil {
+		if user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 			bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
 		}
 		p := d.policy.ForLevel(user.Level)
