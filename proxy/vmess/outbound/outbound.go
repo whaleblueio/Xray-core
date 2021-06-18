@@ -4,7 +4,6 @@ package outbound
 
 import (
 	"context"
-	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"time"
 
@@ -127,16 +126,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		isAEAD = true
 	}
 	var bucket *rateLimit.Bucket
-	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
-		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
-		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
+	if user != nil {
+		bucket = user.Bucket
 	}
-	if user == nil {
-		newError("user is nil").WriteToLog()
-	}
-	if user != nil && user.SpeedLimiter == nil {
-		newError("user ", user.Email, "speed limiter is nil").WriteToLog()
-	}
+
 	session := encoding.NewClientSession(ctx, isAEAD, protocol.DefaultIDHash)
 	sessionPolicy := h.policyManager.ForLevel(request.User.Level)
 
@@ -152,7 +145,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	requestDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 
-		writer := buf.NewBufferedWriter(buf.NewWriterWithRateLimiter(conn, request.User.SpeedLimiter.Speed))
+		writer := buf.NewBufferedWriter(buf.NewWriter(conn))
 		if err := session.EncodeRequestHeader(request, writer); err != nil {
 			return newError("failed to encode request").Base(err).AtWarning()
 		}
@@ -186,7 +179,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	responseDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.UplinkOnly)
 
-		reader := &buf.BufferedReader{Reader: buf.NewLimitReader(conn, request.User.SpeedLimiter.Speed)}
+		reader := &buf.BufferedReader{Reader: buf.NewReader(conn)}
 		header, err := session.DecodeResponseHeader(reader)
 		if err != nil {
 			return newError("failed to read header").Base(err)

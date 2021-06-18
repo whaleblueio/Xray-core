@@ -4,7 +4,6 @@ package freedom
 
 import (
 	"context"
-	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"time"
 
@@ -156,26 +155,17 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	inboundSession := session.InboundFromContext(ctx)
 	user := inboundSession.User
 	var bucket *rateLimit.Bucket
-	var speed int64 = 0
-	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
-		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
-		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
-		speed = user.SpeedLimiter.Speed
-	}
-	if user == nil {
-		newError("user is nil").WriteToLog()
-	}
-	if user != nil && user.SpeedLimiter == nil {
-		newError("user ", user.Email, "speed limiter is nil").WriteToLog()
+	if user != nil {
+		bucket = user.Bucket
 	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 
 		var writer buf.Writer
 		if destination.Network == net.Network_TCP {
-			writer = buf.NewWriterWithRateLimiter(conn, speed)
+			writer = buf.NewWriter(conn)
 		} else {
-			writer = NewPacketWriterWithRateLimiter(conn, h, ctx, UDPOverride, speed)
+			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
 		}
 
 		if err := buf.CopyWithLimiter(input, writer, bucket, buf.UpdateActivity(timer)); err != nil {
@@ -189,9 +179,9 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
-			reader = buf.NewLimitReader(conn, speed)
+			reader = buf.NewReader(conn)
 		} else {
-			reader = NewPacketReaderWithRateLimiter(conn, UDPOverride, speed)
+			reader = NewPacketReader(conn, UDPOverride)
 		}
 		if err := buf.CopyWithLimiter(reader, output, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)

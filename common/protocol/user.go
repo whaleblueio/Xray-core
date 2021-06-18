@@ -1,5 +1,11 @@
 package protocol
 
+import (
+	"fmt"
+	rateLimit "github.com/juju/ratelimit"
+	"time"
+)
+
 func (u *User) GetTypedAccount() (Account, error) {
 	if u.GetAccount() == nil {
 		return nil, newError("Account missing").AtWarning()
@@ -23,19 +29,24 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if err != nil {
 		return nil, err
 	}
+	var bucket *rateLimit.Bucket
+	if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
+		rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+		newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
+	}
 	return &MemoryUser{
-		Account:      account,
-		SpeedLimiter: u.SpeedLimiter,
-		Email:        u.Email,
-		Level:        u.Level,
+		Account: account,
+		Bucket:  bucket,
+		Email:   u.Email,
+		Level:   u.Level,
 	}, nil
 }
 
 // MemoryUser is a parsed form of User, to reduce number of parsing of Account proto.
 type MemoryUser struct {
 	// Account is the parsed account of the protocol.
-	Account      Account
-	SpeedLimiter *SpeedLimiter
-	Email        string
-	Level        uint32
+	Account Account
+	Bucket  *rateLimit.Bucket
+	Email   string
+	Level   uint32
 }

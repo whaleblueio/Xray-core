@@ -4,7 +4,6 @@ package outbound
 
 import (
 	"context"
-	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"syscall"
 	"time"
@@ -187,15 +186,8 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	}
 	user := request.User
 	var bucket *rateLimit.Bucket
-	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
-		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
-		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
-	}
-	if user == nil {
-		newError("user is nil").WriteToLog()
-	}
-	if user != nil && user.SpeedLimiter == nil {
-		newError("user ", user.Email, "speed limiter is nil").WriteToLog()
+	if user != nil {
+		bucket = user.Bucket
 	}
 	postRequest := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
