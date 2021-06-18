@@ -173,7 +173,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.Copy(input, writer, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process request").Base(err)
 		}
-		newError(fmt.Sprintf("user:%s finish write at this connection,sequenceId:%d", user.Email, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
+		newError(fmt.Sprintf("user:%s finish write to %s,sequenceId:%d", user.Email, destination, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 		return nil
 	}
 
@@ -189,7 +189,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
 		}
-		newError(fmt.Sprintf("user:%s finish read at this connection,sequenceId:%d", user.Email, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
+		newError(fmt.Sprintf("user:%s finish read at from %s,sequenceId:%d", user.Email, destination, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 
 		return nil
 	}
