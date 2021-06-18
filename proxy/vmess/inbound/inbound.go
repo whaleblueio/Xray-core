@@ -4,7 +4,6 @@ package inbound
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -257,7 +256,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 			From:   connection.RemoteAddr(),
 			To:     "",
 			Status: log.AccessRejected,
-			Reason: fmt.Sprintf("Insecure encryption,speed limit:%d", request.User.SpeedLimiter.Speed),
+			Reason: "Insecure encryption",
 			Email:  request.User.Email,
 		})
 		return newError("client is using insecure encryption: ", request.Security)
