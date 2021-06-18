@@ -4,6 +4,7 @@ package freedom
 
 import (
 	"context"
+	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"time"
 
@@ -158,6 +159,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
+		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed))
 	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)

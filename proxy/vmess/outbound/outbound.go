@@ -4,6 +4,7 @@ package outbound
 
 import (
 	"context"
+	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"time"
 
@@ -128,6 +129,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	var bucket *rateLimit.Bucket
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
+		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed))
 	}
 	session := encoding.NewClientSession(ctx, isAEAD, protocol.DefaultIDHash)
 	sessionPolicy := h.policyManager.ForLevel(request.User.Level)
