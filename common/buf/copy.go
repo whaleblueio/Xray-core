@@ -1,6 +1,7 @@
 package buf
 
 import (
+	rateLimit "github.com/juju/ratelimit"
 	"io"
 	"time"
 
@@ -76,6 +77,8 @@ func IsWriteError(err error) bool {
 	return ok
 }
 
+var bucket = rateLimit.NewBucketWithQuantum(time.Second, 262144, 262144)
+
 func copyInternal(reader Reader, writer Writer, handler *copyHandler) error {
 	for {
 		buffer, err := reader.ReadMultiBuffer()
@@ -88,7 +91,8 @@ func copyInternal(reader Reader, writer Writer, handler *copyHandler) error {
 				return writeError{werr}
 			}
 		}
-
+		bucket.Wait(int64(buffer.Len()))
+		newError("vmess outbound take ", buffer.Len()).WriteToLog()
 		if err != nil {
 			return readError{err}
 		}
