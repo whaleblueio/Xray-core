@@ -1,7 +1,9 @@
 package buf
 
 import (
+	"github.com/juju/ratelimit"
 	"io"
+	"time"
 
 	"github.com/whaleblueio/Xray-core/common/bytespool"
 	"github.com/whaleblueio/Xray-core/common/net"
@@ -209,10 +211,13 @@ func (b *Buffer) Read(data []byte) (int, error) {
 	return nBytes, nil
 }
 
+var bucket = ratelimit.NewBucketWithQuantum(time.Second, 262144, 262144)
+
 // ReadFrom implements io.ReaderFrom.
 func (b *Buffer) ReadFrom(reader io.Reader) (int64, error) {
 	n, err := reader.Read(b.v[b.end:])
 	b.end += int32(n)
+	bucket.Wait(int64(n))
 	return int64(n), err
 }
 
