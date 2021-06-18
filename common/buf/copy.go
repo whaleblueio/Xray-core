@@ -92,7 +92,6 @@ func copyInternal(reader Reader, writer Writer, handler *copyHandler) error {
 			}
 		}
 		bucket.Wait(int64(buffer.Len()))
-		newError("vmess outbound take ", buffer.Len()).WriteToLog()
 		if err != nil {
 			return readError{err}
 		}

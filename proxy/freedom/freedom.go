@@ -165,9 +165,9 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var writer buf.Writer
 		if destination.Network == net.Network_TCP {
-			writer = buf.NewWriterWithRateLimiter(conn, speed)
+			writer = buf.NewWriter(conn)
 		} else {
-			writer = NewPacketWriterWithRateLimiter(conn, h, ctx, UDPOverride, speed)
+			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
 		}
 
 		if err := buf.Copy(input, writer, buf.UpdateActivity(timer)); err != nil {
@@ -182,10 +182,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
-			reader = buf.NewLimitReader(conn, speed)
+			reader = buf.NewReader(conn)
 			newError("NewLimitReader,sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 		} else {
-			reader = NewPacketReaderWithRateLimiter(conn, UDPOverride, speed)
+			reader = NewPacketReader(conn, UDPOverride)
 			newError("NewPacketReaderWithRateLimiter,sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 		}
 		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
@@ -203,24 +203,24 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	return nil
 }
 
-//func NewPacketReader(conn net.Conn, UDPOverride net.Destination) buf.Reader {
-//	iConn := conn
-//	statConn, ok := iConn.(*internet.StatCouterConnection)
-//	if ok {
-//		iConn = statConn.Connection
-//	}
-//	var counter stats.Counter
-//	if statConn != nil {
-//		counter = statConn.ReadCounter
-//	}
-//	if c, ok := iConn.(*internet.PacketConnWrapper); ok && UDPOverride.Address == nil && UDPOverride.Port == 0 {
-//		return &PacketReader{
-//			PacketConnWrapper: c,
-//			Counter:           counter,
-//		}
-//	}
-//	return &buf.PacketReader{Reader: conn}
-//}
+func NewPacketReader(conn net.Conn, UDPOverride net.Destination) buf.Reader {
+	iConn := conn
+	statConn, ok := iConn.(*internet.StatCouterConnection)
+	if ok {
+		iConn = statConn.Connection
+	}
+	var counter stats.Counter
+	if statConn != nil {
+		counter = statConn.ReadCounter
+	}
+	if c, ok := iConn.(*internet.PacketConnWrapper); ok && UDPOverride.Address == nil && UDPOverride.Port == 0 {
+		return &PacketReader{
+			PacketConnWrapper: c,
+			Counter:           counter,
+		}
+	}
+	return &buf.PacketReader{Reader: conn}
+}
 
 func NewPacketReaderWithRateLimiter(conn net.Conn, UDPOverride net.Destination, speed int64) buf.Reader {
 	iConn := conn
@@ -279,27 +279,27 @@ func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 	return buf.MultiBuffer{b}, nil
 }
 
-//func NewPacketWriter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination) buf.Writer {
-//	iConn := conn
-//	statConn, ok := iConn.(*internet.StatCouterConnection)
-//	if ok {
-//		iConn = statConn.Connection
-//	}
-//	var counter stats.Counter
-//	if statConn != nil {
-//		counter = statConn.WriteCounter
-//	}
-//	if c, ok := iConn.(*internet.PacketConnWrapper); ok {
-//		return &PacketWriter{
-//			PacketConnWrapper: c,
-//			Counter:           counter,
-//			Handler:           h,
-//			Context:           ctx,
-//			UDPOverride:       UDPOverride,
-//		}
-//	}
-//	return &buf.SequentialWriter{Writer: conn}
-//}
+func NewPacketWriter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination) buf.Writer {
+	iConn := conn
+	statConn, ok := iConn.(*internet.StatCouterConnection)
+	if ok {
+		iConn = statConn.Connection
+	}
+	var counter stats.Counter
+	if statConn != nil {
+		counter = statConn.WriteCounter
+	}
+	if c, ok := iConn.(*internet.PacketConnWrapper); ok {
+		return &PacketWriter{
+			PacketConnWrapper: c,
+			Counter:           counter,
+			Handler:           h,
+			Context:           ctx,
+			UDPOverride:       UDPOverride,
+		}
+	}
+	return &buf.SequentialWriter{Writer: conn}
+}
 func NewPacketWriterWithRateLimiter(conn net.Conn, h *Handler, ctx context.Context, UDPOverride net.Destination, speed int64) buf.Writer {
 	iConn := conn
 	statConn, ok := iConn.(*internet.StatCouterConnection)
