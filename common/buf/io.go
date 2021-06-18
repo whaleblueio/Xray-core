@@ -50,17 +50,13 @@ func isPacketReader(reader io.Reader) bool {
 
 func NewLimitReader(reader io.Reader, speed int64) Reader {
 	if mr, ok := reader.(Reader); ok {
-
-		log.Record(&log.GeneralMessage{
-			Content: "NewLimitReader() is multiple Reader",
-		})
-		newError("NewLimitReader() is multiple Reader sequenceId:", common.GetSequenceId())
+		newError("NewLimitReader() is multiple Reader sequenceId:", common.GetSequenceId()).WriteToLog()
 		return mr
 	}
 	if speed > 0 {
 		bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
 		limitReader := rateLimit.Reader(reader, bucket)
-		newError("NewLimitReader() is speed limit Reader sequenceId:", common.GetSequenceId())
+		newError("NewLimitReader() is speed limit Reader sequenceId:", common.GetSequenceId()).WriteToLog()
 
 		if isPacketReader(reader) {
 			return &PacketReader{
@@ -84,7 +80,7 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 			Reader: limitReader,
 		}
 	}
-	newError("NewLimitReader() is no limit Reader sequenceId:", common.GetSequenceId())
+	newError("NewLimitReader() is no limit Reader sequenceId:", common.GetSequenceId()).WriteToLog()
 
 	if isPacketReader(reader) {
 		return &PacketReader{
