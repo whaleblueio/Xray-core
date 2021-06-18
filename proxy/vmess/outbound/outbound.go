@@ -190,7 +190,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			bodyReader = xudp.NewPacketReader(&buf.BufferedReader{Reader: bodyReader})
 		}
 
-		return buf.Copy(bodyReader, output, buf.UpdateActivity(timer))
+		return buf.CopyWithLimiter(bodyReader, output, bucket, buf.UpdateActivity(timer))
 	}
 
 	var responseDonePost = task.OnSuccess(responseDone, task.Close(output))

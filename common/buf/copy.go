@@ -107,7 +107,9 @@ func copyInternalWithLimiter(reader Reader, writer Writer, bucket *rateLimit.Buc
 				return writeError{werr}
 			}
 		}
-		bucket.Wait(int64(buffer.Len()))
+		if bucket != nil {
+			bucket.Wait(int64(buffer.Len()))
+		}
 		if err != nil {
 			return readError{err}
 		}
@@ -161,6 +163,8 @@ func CopyOnceTimeoutWithLimiter(reader Reader, writer Writer, timeout time.Durat
 	if err != nil {
 		return err
 	}
-	bucket.Wait(int64(mb.Len()))
+	if bucket != nil {
+		bucket.Wait(int64(mb.Len()))
+	}
 	return writer.WriteMultiBuffer(mb)
 }

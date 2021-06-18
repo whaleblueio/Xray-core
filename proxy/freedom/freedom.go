@@ -152,7 +152,13 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	plcy := h.policy()
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
+	inboundSession := session.InboundFromContext(ctx)
+	user := inboundSession.User
+	var bucket *rateLimit.Bucket
 
+	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
+	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 
@@ -163,7 +169,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
 		}
 
-		if err := buf.Copy(input, writer, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(input, writer, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process request").Base(err)
 		}
 		return nil
@@ -178,7 +184,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		} else {
 			reader = NewPacketReader(conn, UDPOverride)
 		}
-		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(reader, output, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
 		}
 
