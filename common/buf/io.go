@@ -80,7 +80,6 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 			Reader: limitReader,
 		}
 	}
-	newError("NewLimitReader() is no limit Reader sequenceId:", common.GetSequenceId()).WriteToLog()
 
 	if isPacketReader(reader) {
 		return &PacketReader{

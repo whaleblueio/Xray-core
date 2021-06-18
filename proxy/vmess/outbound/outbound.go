@@ -131,6 +131,12 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
 		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
 	}
+	if user == nil {
+		newError("user is nil").WriteToLog()
+	}
+	if user != nil && user.SpeedLimiter == nil {
+		newError("user ", user.Email, "speed limiter is nil").WriteToLog()
+	}
 	session := encoding.NewClientSession(ctx, isAEAD, protocol.DefaultIDHash)
 	sessionPolicy := h.policyManager.ForLevel(request.User.Level)
 

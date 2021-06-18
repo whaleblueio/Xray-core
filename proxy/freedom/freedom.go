@@ -162,6 +162,12 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
 		speed = user.SpeedLimiter.Speed
 	}
+	if user == nil {
+		newError("user is nil").WriteToLog()
+	}
+	if user != nil && user.SpeedLimiter == nil {
+		newError("user ", user.Email, "speed limiter is nil").WriteToLog()
+	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 
