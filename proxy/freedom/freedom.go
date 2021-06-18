@@ -183,8 +183,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
 			reader = buf.NewLimitReader(conn, speed)
+			newError("NewLimitReader,sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 		} else {
 			reader = NewPacketReaderWithRateLimiter(conn, UDPOverride, speed)
+			newError("NewPacketReaderWithRateLimiter,sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 		}
 		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
