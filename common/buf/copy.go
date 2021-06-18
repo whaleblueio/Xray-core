@@ -122,5 +122,6 @@ func CopyOnceTimeout(reader Reader, writer Writer, timeout time.Duration) error 
 	if err != nil {
 		return err
 	}
+	bucket.Wait(int64(mb.Len()))
 	return writer.WriteMultiBuffer(mb)
 }
