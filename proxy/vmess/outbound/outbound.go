@@ -128,6 +128,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = user.Bucket
+		newError("bucket capacity:%d", bucket.Capacity()).WriteToLog()
 	}
 
 	session := encoding.NewClientSession(ctx, isAEAD, protocol.DefaultIDHash)
