@@ -31,7 +31,7 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	}
 	var bucket *rateLimit.Bucket
 	if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
-		rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
 		newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
 	}
 	return &MemoryUser{

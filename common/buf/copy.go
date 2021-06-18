@@ -107,8 +107,8 @@ func copyInternalWithLimiter(reader Reader, writer Writer, bucket *rateLimit.Buc
 				return writeError{werr}
 			}
 		}
-		if globalBucket != nil {
-			globalBucket.Wait(int64(buffer.Len()))
+		if bucket != nil {
+			bucket.Wait(int64(buffer.Len()))
 		}
 		if err != nil {
 			return readError{err}
@@ -116,7 +116,7 @@ func copyInternalWithLimiter(reader Reader, writer Writer, bucket *rateLimit.Buc
 	}
 }
 
-var globalBucket = rateLimit.NewBucketWithQuantum(time.Second, 262144, 262144)
+//var globalBucket = rateLimit.NewBucketWithQuantum(time.Second, 262144, 262144)
 
 // Copy dumps all payload from reader to writer or stops when an error occurs. It returns nil when EOF.
 func Copy(reader Reader, writer Writer, options ...CopyOption) error {
@@ -165,8 +165,8 @@ func CopyOnceTimeoutWithLimiter(reader Reader, writer Writer, timeout time.Durat
 	if err != nil {
 		return err
 	}
-	if globalBucket != nil {
-		globalBucket.Wait(int64(mb.Len()))
+	if bucket != nil {
+		bucket.Wait(int64(mb.Len()))
 	}
 	return writer.WriteMultiBuffer(mb)
 }
