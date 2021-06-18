@@ -188,7 +188,11 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = protocol.GetBucket(user.Email)
-		newError("bucket capacity:", bucket.Capacity()).WriteToLog()
+		if bucket != nil {
+			newError("bucket capacity:", bucket.Capacity()).WriteToLog()
+		} else {
+			newError("bucket is nil:").WriteToLog()
+		}
 	} else {
 		newError("user is nil").WriteToLog()
 	}
