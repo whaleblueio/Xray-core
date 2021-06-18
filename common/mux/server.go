@@ -109,7 +109,7 @@ func (w *ServerWorker) handleStatusKeepAlive(meta *FrameMetadata, reader *buf.Bu
 }
 
 func (w *ServerWorker) handleStatusNew(ctx context.Context, meta *FrameMetadata, reader *buf.BufferedReader) error {
-	newError("received request for ", meta.Target).WriteToLog(session.ExportIDToError(ctx))
+	newError("received request for ", meta.Target, ",sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 	{
 		msg := &log.AccessMessage{
 			To:     meta.Target,

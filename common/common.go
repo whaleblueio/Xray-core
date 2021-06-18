@@ -17,7 +17,8 @@ import (
 
 var (
 	// ErrNoClue is for the situation that existing information is not enough to make a decision. For example, Router may return this error when there is no suitable route.
-	ErrNoClue = errors.New("not enough information for making a decision")
+	ErrNoClue        = errors.New("not enough information for making a decision")
+	SequenceId int64 = 1000
 )
 
 // Must panics if err is not nil.
@@ -25,6 +26,11 @@ func Must(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func GetSequenceId() int64 {
+	SequenceId++
+	return SequenceId
 }
 
 // Must2 panics if the second parameter is not nil, otherwise returns the first parameter.

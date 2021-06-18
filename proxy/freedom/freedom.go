@@ -118,7 +118,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			UDPOverride.Port = destination.Port
 		}
 	}
-	newError("opening connection to ", destination).WriteToLog(session.ExportIDToError(ctx))
+	newError("opening connection to ", destination, " sequeceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 
 	input := link.Reader
 	output := link.Writer
@@ -154,7 +154,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
 	user := session.InboundFromContext(ctx).User
-	newError(fmt.Sprintf("User:%s connected to %s", user.Email, destination)).WriteToLog(session.ExportIDToError(ctx))
+	newError(fmt.Sprintf("User:%s connected to %s,sequenceId:%d", user.Email, destination, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 	var speed int64 = 0
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		speed = user.SpeedLimiter.Speed
@@ -173,7 +173,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.Copy(input, writer, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process request").Base(err)
 		}
-
+		newError(fmt.Sprintf("user:%s finish write at this connection,sequenceId:%d", user.Email, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 		return nil
 	}
 
@@ -189,6 +189,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
 		}
+		newError(fmt.Sprintf("user:%s finish read at this connection,sequenceId:%d", user.Email, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 
 		return nil
 	}

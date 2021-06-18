@@ -2,6 +2,8 @@ package internet
 
 import (
 	"context"
+	"fmt"
+	"github.com/whaleblueio/Xray-core/common"
 
 	"github.com/whaleblueio/Xray-core/common/net"
 	"github.com/whaleblueio/Xray-core/common/session"
@@ -58,6 +60,7 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *MemoryStrea
 		}
 		return udpDialer(ctx, dest, streamSettings)
 	}
+	newError(fmt.Sprintf(" finish dial to :%s,sequenceId:%d", dest.Address, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 
 	return nil, newError("unknown network ", dest.Network)
 }
