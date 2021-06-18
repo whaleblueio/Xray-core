@@ -4,6 +4,7 @@ package outbound
 
 import (
 	"context"
+	rateLimit "github.com/juju/ratelimit"
 	"syscall"
 	"time"
 
@@ -183,7 +184,11 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		request.Address = net.DomainAddress("v1.mux.cool")
 		request.Port = net.Port(666)
 	}
-
+	user := request.User
+	var bucket *rateLimit.Bucket
+	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
+	}
 	postRequest := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 
@@ -197,7 +202,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if request.Command == protocol.RequestCommandMux && request.Port == 666 {
 			serverWriter = xudp.NewPacketWriter(serverWriter, target)
 		}
-		if err := buf.CopyOnceTimeout(clientReader, serverWriter, time.Millisecond*100); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
+		if err := buf.CopyOnceTimeoutWithLimiter(clientReader, serverWriter, time.Millisecond*100, bucket); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
 			return err // ...
 		}
 
@@ -207,7 +212,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		}
 
 		// from clientReader.ReadMultiBuffer to serverWriter.WriteMultiBufer
-		if err := buf.Copy(clientReader, serverWriter, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(clientReader, serverWriter, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to transfer request payload").Base(err).AtInfo()
 		}
 
@@ -240,7 +245,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			err = encoding.ReadV(serverReader, clientWriter, timer, iConn.(*xtls.Conn), rawConn, counter, sctx)
 		} else {
 			// from serverReader.ReadMultiBuffer to clientWriter.WriteMultiBufer
-			err = buf.Copy(serverReader, clientWriter, buf.UpdateActivity(timer))
+			err = buf.CopyWithLimiter(serverReader, clientWriter, bucket, buf.UpdateActivity(timer))
 		}
 
 		if err != nil {

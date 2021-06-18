@@ -4,6 +4,7 @@ package outbound
 
 import (
 	"context"
+	rateLimit "github.com/juju/ratelimit"
 	"time"
 
 	"github.com/whaleblueio/Xray-core/common"
@@ -124,7 +125,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	if !aeadDisabled && len(account.AlterIDs) == 0 {
 		isAEAD = true
 	}
-
+	var bucket *rateLimit.Bucket
+	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
+	}
 	session := encoding.NewClientSession(ctx, isAEAD, protocol.DefaultIDHash)
 	sessionPolicy := h.policyManager.ForLevel(request.User.Level)
 
@@ -150,7 +154,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if request.Command == protocol.RequestCommandMux && request.Port == 666 {
 			bodyWriter = xudp.NewPacketWriter(bodyWriter, target)
 		}
-		if err := buf.CopyOnceTimeout(input, bodyWriter, time.Millisecond*100); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
+		if err := buf.CopyOnceTimeoutWithLimiter(input, bodyWriter, time.Millisecond*100, bucket); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
 			return newError("failed to write first payload").Base(err)
 		}
 
@@ -158,7 +162,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			return err
 		}
 
-		if err := buf.Copy(input, bodyWriter, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(input, bodyWriter, bucket, buf.UpdateActivity(timer)); err != nil {
 			return err
 		}
 

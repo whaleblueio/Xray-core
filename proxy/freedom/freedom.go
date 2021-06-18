@@ -4,7 +4,6 @@ package freedom
 
 import (
 	"context"
-	"fmt"
 	rateLimit "github.com/juju/ratelimit"
 	"time"
 
@@ -153,13 +152,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	plcy := h.policy()
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
-	user := session.InboundFromContext(ctx).User
-	newError(fmt.Sprintf("User:%s connected to %s,sequenceId:%d", user.Email, destination, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
-	var speed int64 = 0
-	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
-		speed = user.SpeedLimiter.Speed
-		newError(fmt.Sprintf("user:%s speed limit:%d,sequenceId:%d", user.Email, speed, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
-	}
+
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 
@@ -173,7 +166,6 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.Copy(input, writer, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process request").Base(err)
 		}
-		newError(fmt.Sprintf("user:%s finish write to %s,sequenceId:%d", user.Email, destination, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 		return nil
 	}
 
@@ -183,15 +175,12 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
 			reader = buf.NewReader(conn)
-			newError("NewLimitReader,sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 		} else {
 			reader = NewPacketReader(conn, UDPOverride)
-			newError("NewPacketReaderWithRateLimiter,sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 		}
 		if err := buf.Copy(reader, output, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
 		}
-		newError(fmt.Sprintf("user:%s finish read at from %s,sequenceId:%d", user.Email, destination, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 
 		return nil
 	}
@@ -269,9 +258,6 @@ func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 	}
 	if r.Bucket != nil {
 		r.Bucket.Wait(int64(n))
-		newError("reader take ", n).WriteToLog()
-	} else {
-		newError("reader bucket is nil").WriteToLog()
 	}
 	if r.Counter != nil {
 		r.Counter.Add(int64(n))

@@ -77,9 +77,25 @@ func IsWriteError(err error) bool {
 	return ok
 }
 
-var bucket = rateLimit.NewBucketWithQuantum(time.Second, 262144, 262144)
-
 func copyInternal(reader Reader, writer Writer, handler *copyHandler) error {
+	for {
+		buffer, err := reader.ReadMultiBuffer()
+		if !buffer.IsEmpty() {
+			for _, handler := range handler.onData {
+				handler(buffer)
+			}
+
+			if werr := writer.WriteMultiBuffer(buffer); werr != nil {
+				return writeError{werr}
+			}
+		}
+		if err != nil {
+			return readError{err}
+		}
+	}
+}
+
+func copyInternalWithLimiter(reader Reader, writer Writer, bucket *rateLimit.Bucket, handler *copyHandler) error {
 	for {
 		buffer, err := reader.ReadMultiBuffer()
 		if !buffer.IsEmpty() {
@@ -111,9 +127,32 @@ func Copy(reader Reader, writer Writer, options ...CopyOption) error {
 	return nil
 }
 
+func CopyWithLimiter(reader Reader, writer Writer, bucket *rateLimit.Bucket, options ...CopyOption) error {
+	var handler copyHandler
+	for _, option := range options {
+		option(&handler)
+	}
+	err := copyInternalWithLimiter(reader, writer, bucket, &handler)
+	if err != nil && errors.Cause(err) != io.EOF {
+		return err
+	}
+	return nil
+}
+
 var ErrNotTimeoutReader = newError("not a TimeoutReader")
 
 func CopyOnceTimeout(reader Reader, writer Writer, timeout time.Duration) error {
+	timeoutReader, ok := reader.(TimeoutReader)
+	if !ok {
+		return ErrNotTimeoutReader
+	}
+	mb, err := timeoutReader.ReadMultiBufferTimeout(timeout)
+	if err != nil {
+		return err
+	}
+	return writer.WriteMultiBuffer(mb)
+}
+func CopyOnceTimeoutWithLimiter(reader Reader, writer Writer, timeout time.Duration, bucket *rateLimit.Bucket) error {
 	timeoutReader, ok := reader.(TimeoutReader)
 	if !ok {
 		return ErrNotTimeoutReader
