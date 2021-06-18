@@ -267,6 +267,7 @@ func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 	}
 	if r.Bucket != nil {
 		r.Bucket.Wait(int64(n))
+		newError("take ", n).WriteToLog()
 	} else {
 		newError("reader bucket is nil").WriteToLog()
 	}
