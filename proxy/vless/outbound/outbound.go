@@ -187,7 +187,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	user := request.User
 	var bucket *rateLimit.Bucket
 	if user != nil {
-		bucket = user.Bucket
+		bucket = protocol.GetBucket(user.Email)
+		newError("bucket capacity:", bucket.Capacity()).WriteToLog()
+	} else {
+		newError("user is nil").WriteToLog()
 	}
 	postRequest := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
