@@ -2,6 +2,7 @@ package buf
 
 import (
 	rateLimit "github.com/juju/ratelimit"
+	"github.com/whaleblueio/Xray-core/common"
 	"github.com/whaleblueio/Xray-core/common/log"
 	"io"
 	"net"
@@ -53,11 +54,13 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 		log.Record(&log.GeneralMessage{
 			Content: "NewLimitReader() is multiple Reader",
 		})
+		newError("NewLimitReader() is multiple Reader sequenceId:", common.GetSequenceId())
 		return mr
 	}
 	if speed > 0 {
 		bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
 		limitReader := rateLimit.Reader(reader, bucket)
+		newError("NewLimitReader() is speed limit Reader sequenceId:", common.GetSequenceId())
 
 		if isPacketReader(reader) {
 			return &PacketReader{
@@ -81,6 +84,7 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 			Reader: limitReader,
 		}
 	}
+	newError("NewLimitReader() is no limit Reader sequenceId:", common.GetSequenceId())
 
 	if isPacketReader(reader) {
 		return &PacketReader{
