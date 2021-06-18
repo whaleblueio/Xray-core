@@ -120,7 +120,7 @@ func (d *DefaultSystemDialer) redirect(ctx context.Context, dst net.Destination,
 }
 
 func (d *DefaultSystemDialer) Dial(ctx context.Context, src net.Address, dest net.Destination, sockopt *SocketConfig) (net.Conn, error) {
-	newError("dialing to " + dest.String()).AtDebug().WriteToLog()
+	newError("dialing to "+dest.String(), " sequenceId:", common.GetSequenceId()).AtDebug().WriteToLog()
 	if d.obm != nil && sockopt != nil && len(sockopt.DialerProxy) > 0 {
 		nc := d.redirect(ctx, dest, sockopt.DialerProxy)
 		if nc != nil {

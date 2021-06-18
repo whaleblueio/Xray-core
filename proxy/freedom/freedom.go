@@ -134,7 +134,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 					Address: ip,
 					Port:    dialDest.Port,
 				}
-				newError("dialing to ", dialDest).WriteToLog(session.ExportIDToError(ctx))
+				newError("dialing to ", dialDest, " sequenceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 			}
 		}
 
@@ -158,7 +158,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	var speed int64 = 0
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		speed = user.SpeedLimiter.Speed
-		newError(fmt.Sprintf("user:%s speed limit:%d", user.Email, speed)).WriteToLog(session.ExportIDToError(ctx))
+		newError(fmt.Sprintf("user:%s speed limit:%d,sequenceId:%d", user.Email, speed, common.GetSequenceId())).WriteToLog(session.ExportIDToError(ctx))
 	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
@@ -195,7 +195,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	}
 
 	if err := task.Run(ctx, requestDone, task.OnSuccess(responseDone, task.Close(output))); err != nil {
-		return newError("connection ends").Base(err)
+		return newError("connection ends,sequenceId:", common.GetSequenceId()).Base(err)
 	}
 
 	return nil
