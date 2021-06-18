@@ -55,13 +55,12 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 	}
 	if speed > 0 {
 		bucket := rateLimit.NewBucketWithQuantum(time.Second, speed, speed)
-		//limitReader := rateLimit.Reader(reader, bucket)
+		limitReader := rateLimit.Reader(reader, bucket)
 		newError("NewLimitReader() is speed limit Reader sequenceId:", common.GetSequenceId()).WriteToLog()
 
 		if isPacketReader(reader) {
 			return &PacketReader{
-				Reader: reader,
-				Bucket: bucket,
+				Reader: limitReader,
 			}
 		}
 
@@ -72,14 +71,13 @@ func NewLimitReader(reader io.Reader, speed int64) Reader {
 				if err != nil {
 					newError("failed to get sysconn").Base(err).WriteToLog()
 				} else {
-					return NewReadVReader(reader, rawConn)
+					return NewReadVReader(limitReader, rawConn)
 				}
 			}
 		}
 
 		return &SingleReader{
-			Reader: reader,
-			Bucket: bucket,
+			Reader: limitReader,
 		}
 	}
 	newError("NewLimitReader() is no limit Reader sequenceId:", common.GetSequenceId()).WriteToLog()

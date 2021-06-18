@@ -1,7 +1,6 @@
 package buf
 
 import (
-	rateLimit "github.com/juju/ratelimit"
 	"github.com/whaleblueio/Xray-core/common"
 	"github.com/whaleblueio/Xray-core/common/errors"
 	"io"
@@ -151,7 +150,6 @@ func (r *BufferedReader) Close() error {
 // SingleReader is a Reader that read one Buffer every time.
 type SingleReader struct {
 	io.Reader
-	Bucket *rateLimit.Bucket
 }
 
 // ReadMultiBuffer implements Reader.
@@ -163,7 +161,6 @@ func (r *SingleReader) ReadMultiBuffer() (MultiBuffer, error) {
 // PacketReader is a Reader that read one Buffer every time.
 type PacketReader struct {
 	io.Reader
-	Bucket *rateLimit.Bucket
 }
 
 // ReadMultiBuffer implements Reader.
