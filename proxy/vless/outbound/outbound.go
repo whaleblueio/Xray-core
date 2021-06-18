@@ -189,7 +189,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	var bucket *rateLimit.Bucket
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
-		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed))
+		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
 	}
 	postRequest := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)

@@ -156,19 +156,20 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	inboundSession := session.InboundFromContext(ctx)
 	user := inboundSession.User
 	var bucket *rateLimit.Bucket
-
+	var speed int64 = 0
 	if user != nil && user.SpeedLimiter != nil && user.SpeedLimiter.Speed > 0 {
 		bucket = rateLimit.NewBucketWithQuantum(time.Second, user.SpeedLimiter.Speed, user.SpeedLimiter.Speed)
-		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed))
+		newError(fmt.Sprintf("user:%s speed limit:%", user.SpeedLimiter.Speed)).WriteToLog()
+		speed = user.SpeedLimiter.Speed
 	}
 	requestDone := func() error {
 		defer timer.SetTimeout(plcy.Timeouts.DownlinkOnly)
 
 		var writer buf.Writer
 		if destination.Network == net.Network_TCP {
-			writer = buf.NewWriter(conn)
+			writer = buf.NewWriterWithRateLimiter(conn, speed)
 		} else {
-			writer = NewPacketWriter(conn, h, ctx, UDPOverride)
+			writer = NewPacketWriterWithRateLimiter(conn, h, ctx, UDPOverride, speed)
 		}
 
 		if err := buf.CopyWithLimiter(input, writer, bucket, buf.UpdateActivity(timer)); err != nil {
@@ -182,9 +183,9 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 
 		var reader buf.Reader
 		if destination.Network == net.Network_TCP {
-			reader = buf.NewReader(conn)
+			reader = buf.NewLimitReader(conn, speed)
 		} else {
-			reader = NewPacketReader(conn, UDPOverride)
+			reader = NewPacketReaderWithRateLimiter(conn, UDPOverride, speed)
 		}
 		if err := buf.CopyWithLimiter(reader, output, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
@@ -369,10 +370,7 @@ func (w *PacketWriter) WriteMultiBuffer(mb buf.MultiBuffer) error {
 		}
 		if w.Bucket != nil {
 			w.Bucket.Wait(int64(n))
-			newError("writer take ", n).WriteToLog()
 
-		} else {
-			newError("writer bucket is nil").WriteToLog()
 		}
 		if w.Counter != nil {
 			w.Counter.Add(int64(n))
