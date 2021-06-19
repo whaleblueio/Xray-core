@@ -30,23 +30,7 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	var bucket *rateLimit.Bucket
-	if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
-		bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
-		b, ok := buckets.Load(u.Email)
-		if ok {
-			bucket := b.(*rateLimit.Bucket)
-			if bucket.Capacity() != u.SpeedLimiter.Speed {
-				newError(fmt.Sprintf("user:%s update speed limit,:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
-				bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
-				buckets.Store(u.Email, bucket)
-			}
-		} else {
-			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
-			buckets.Store(u.Email, bucket)
-			newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
-		}
-	}
+
 	return &MemoryUser{
 		Account: account,
 		Email:   u.Email,
@@ -70,4 +54,25 @@ func GetBucket(email string) *rateLimit.Bucket {
 		return b.(*rateLimit.Bucket)
 	}
 	return nil
+}
+func SetBucket(u *User) {
+	var bucket *rateLimit.Bucket
+	if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
+		bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+		b, ok := buckets.Load(u.Email)
+		if ok {
+			bucket := b.(*rateLimit.Bucket)
+			if bucket.Capacity() != u.SpeedLimiter.Speed {
+				newError(fmt.Sprintf("user:%s update speed limit,:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
+				bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+				buckets.Store(u.Email, bucket)
+			}
+		} else {
+			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+			buckets.Store(u.Email, bucket)
+			newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
+		}
+	} else {
+		newError(fmt.Sprintf("user:%s no speed limit", u.Email)).WriteToLog()
+	}
 }

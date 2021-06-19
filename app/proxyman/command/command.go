@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/whaleblueio/Xray-core/common/protocol"
 
 	grpc "google.golang.org/grpc"
 
@@ -45,10 +46,10 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 	for _, u := range op.Users {
 		mUser, err := u.ToMemoryUser()
 		if err != nil {
-
 			return newError("failed to parse user").Base(err)
 		}
 		err = um.AddUser(ctx, mUser)
+		protocol.SetBucket(u)
 		if err != nil {
 			return newError("failed to add user").Base(err)
 		}

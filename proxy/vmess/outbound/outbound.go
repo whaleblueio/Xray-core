@@ -131,7 +131,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if bucket != nil {
 			newError("bucket capacity:", bucket.Capacity()).WriteToLog()
 		} else {
-			newError("bucket is nil:").WriteToLog()
+			newError("bucket is nil for email:", user.Email).WriteToLog()
 		}
 	} else {
 		newError("user is nil").WriteToLog()
