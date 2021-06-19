@@ -57,22 +57,28 @@ func GetBucket(email string) *rateLimit.Bucket {
 }
 func SetBucket(u *User) {
 	var bucket *rateLimit.Bucket
-	if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
-		bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
-		b, ok := buckets.Load(u.Email)
-		if ok {
+	b, ok := buckets.Load(u.Email)
+	if ok {
+		if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
+			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
 			bucket := b.(*rateLimit.Bucket)
 			if bucket.Capacity() != u.SpeedLimiter.Speed {
-				newError(fmt.Sprintf("user:%s update speed limit,:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
+				newError(fmt.Sprintf("user:%s update speed limit to :%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
 				bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
 				buckets.Store(u.Email, bucket)
 			}
-		} else {
+		}
+
+		if u.SpeedLimiter != nil && u.SpeedLimiter.Speed < 0 {
+			buckets.Delete(u.Email)
+		}
+	} else {
+		if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
 			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
 			buckets.Store(u.Email, bucket)
 			newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
+		} else {
+			newError(fmt.Sprintf("user:%s no speed limit", u.Email)).WriteToLog()
 		}
-	} else {
-		newError(fmt.Sprintf("user:%s no speed limit", u.Email)).WriteToLog()
 	}
 }
