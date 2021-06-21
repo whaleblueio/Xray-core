@@ -4,6 +4,7 @@ package inbound
 
 import (
 	"context"
+	rateLimit "github.com/juju/ratelimit"
 	"io"
 	"strconv"
 	"strings"
@@ -209,7 +210,13 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	} else {
 		request, requestAddons, isfb, err = encoding.DecodeRequestHeader(isfb, first, reader, h.validator)
 	}
-
+	user := request.User
+	var bucket *rateLimit.Bucket
+	if user != nil {
+		bucket = protocol.GetBucket(user.Email)
+	} else {
+		newError("user is nil").WriteToLog()
+	}
 	if err != nil {
 		if isfb {
 			if err := connection.SetReadDeadline(time.Time{}); err != nil {
@@ -388,7 +395,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 						return newError("failed to set PROXY protocol v", fb.Xver).Base(err).AtWarning()
 					}
 				}
-				if err := buf.Copy(reader, serverWriter, buf.UpdateActivity(timer)); err != nil {
+				if err := buf.CopyWithLimiter(reader, serverWriter, bucket, buf.UpdateActivity(timer)); err != nil {
 					return newError("failed to fallback request payload").Base(err).AtInfo()
 				}
 				return nil
@@ -398,7 +405,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 
 			getResponse := func() error {
 				defer timer.SetTimeout(sessionPolicy.Timeouts.UplinkOnly)
-				if err := buf.Copy(serverReader, writer, buf.UpdateActivity(timer)); err != nil {
+				if err := buf.CopyWithLimiter(serverReader, writer, bucket, buf.UpdateActivity(timer)); err != nil {
 					return newError("failed to deliver response payload").Base(err).AtInfo()
 				}
 				return nil
