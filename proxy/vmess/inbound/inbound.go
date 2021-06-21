@@ -4,6 +4,7 @@ package inbound
 
 import (
 	"context"
+	rateLimit "github.com/juju/ratelimit"
 	"io"
 	"strings"
 	"sync"
@@ -180,7 +181,7 @@ func (h *Handler) RemoveUser(ctx context.Context, email string) error {
 	return nil
 }
 
-func transferResponse(timer signal.ActivityUpdater, session *encoding.ServerSession, request *protocol.RequestHeader, response *protocol.ResponseHeader, input buf.Reader, output *buf.BufferedWriter) error {
+func transferResponse(timer signal.ActivityUpdater, session *encoding.ServerSession, request *protocol.RequestHeader, response *protocol.ResponseHeader, input buf.Reader, output *buf.BufferedWriter, bucket *rateLimit.Bucket) error {
 	session.EncodeResponseHeader(response, output)
 
 	bodyWriter := session.EncodeResponseBody(request, output)
@@ -201,7 +202,7 @@ func transferResponse(timer signal.ActivityUpdater, session *encoding.ServerSess
 		return err
 	}
 
-	if err := buf.Copy(input, bodyWriter, buf.UpdateActivity(timer)); err != nil {
+	if err := buf.CopyWithLimiter(input, bodyWriter, bucket, buf.UpdateActivity(timer)); err != nil {
 		return err
 	}
 
@@ -294,11 +295,18 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	if err != nil {
 		return newError("failed to dispatch request to ", request.Destination()).Base(err)
 	}
-
+	inboundSession := session.InboundFromContext(ctx)
+	user := inboundSession.User
+	var bucket *rateLimit.Bucket
+	if user != nil {
+		bucket = protocol.GetBucket(user.Email)
+	} else {
+		newError("user is nil").WriteToLog()
+	}
 	requestDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 		bodyReader := svrSession.DecodeRequestBody(request, reader)
-		if err := buf.Copy(bodyReader, link.Writer, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(bodyReader, link.Writer, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to transfer request").Base(err)
 		}
 		return nil
@@ -313,7 +321,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		response := &protocol.ResponseHeader{
 			Command: h.generateCommand(ctx, request),
 		}
-		return transferResponse(timer, svrSession, request, response, link.Reader, writer)
+		return transferResponse(timer, svrSession, request, response, link.Reader, writer, bucket)
 	}
 
 	var requestDonePost = task.OnSuccess(requestDone, task.Close(link.Writer))
