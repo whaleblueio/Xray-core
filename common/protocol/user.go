@@ -60,11 +60,11 @@ func SetBucket(u *User) {
 	b, ok := buckets.Load(u.Email)
 	if ok {
 		if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
-			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed/2)
 			bucket := b.(*rateLimit.Bucket)
 			if bucket.Capacity() != u.SpeedLimiter.Speed {
 				newError(fmt.Sprintf("user:%s update speed limit to :%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
-				bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+				bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed/2)
 				buckets.Store(u.Email, bucket)
 			}
 		}
@@ -74,7 +74,7 @@ func SetBucket(u *User) {
 		}
 	} else {
 		if u.SpeedLimiter != nil && u.SpeedLimiter.Speed > 0 {
-			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed)
+			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed/2)
 			buckets.Store(u.Email, bucket)
 			newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
 		} else {
