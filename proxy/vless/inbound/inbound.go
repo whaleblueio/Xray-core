@@ -210,7 +210,10 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	} else {
 		request, requestAddons, isfb, err = encoding.DecodeRequestHeader(isfb, first, reader, h.validator)
 	}
-	user := request.User
+	var user *protocol.MemoryUser
+	if request != nil || request.User != nil {
+		user = request.User
+	}
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = protocol.GetBucket(user.Email)

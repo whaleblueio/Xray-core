@@ -154,7 +154,10 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
 	inboundSession := session.InboundFromContext(ctx)
-	user := inboundSession.User
+	var user *protocol.MemoryUser
+	if inboundSession != nil || inboundSession.User != nil {
+		user = inboundSession.User
+	}
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = protocol.GetBucket(user.Email)

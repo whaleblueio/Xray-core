@@ -283,7 +283,6 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	if inbound == nil {
 		panic("no inbound metadata")
 	}
-	inbound.User = request.User
 
 	sessionPolicy = h.policyManager.ForLevel(request.User.Level)
 
@@ -296,7 +295,11 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		return newError("failed to dispatch request to ", request.Destination()).Base(err)
 	}
 	inboundSession := session.InboundFromContext(ctx)
-	user := inboundSession.User
+	var user *protocol.MemoryUser
+	if request != nil || inboundSession.User != nil {
+		user = inboundSession.User
+	}
+
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = protocol.GetBucket(user.Email)
