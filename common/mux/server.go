@@ -116,7 +116,7 @@ func (w *ServerWorker) handleStatusNew(ctx context.Context, meta *FrameMetadata,
 			Status: log.AccessAccepted,
 			Reason: "",
 		}
-		if inbound := session.InboundFromContext(ctx); inbound != nil && inbound.Source.IsValid() {
+		if inbound := session.InboundFromContext(ctx); inbound != nil && inbound.Source.IsValid() && inbound.User != nil {
 			msg.From = inbound.Source
 			msg.Email = inbound.User.Email
 		}
