@@ -159,7 +159,12 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 					Counter: c,
 					Writer:  inboundLink.Writer,
 				}
+			} else {
+				newError("user :", user.Email, "setup UserUpLink but not found userlink:", name).WriteToLog(session.ExportIDToError(ctx))
+
 			}
+		} else {
+			newError("user :", user.Email, " not setup UserUpLink").WriteToLog(session.ExportIDToError(ctx))
 		}
 		if p.Stats.UserDownlink {
 			name := "user>>>" + user.Email + ">>>traffic>>>downlink"
@@ -170,6 +175,8 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 				}
 			}
 		}
+	} else {
+		newError("user is nil, will not create statLink").WriteToLog(session.ExportIDToError(ctx))
 	}
 
 	return inboundLink, outboundLink
