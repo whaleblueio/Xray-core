@@ -296,7 +296,6 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	}
 	var user *protocol.MemoryUser
 
-	inbound.User = request.User
 	user = request.User
 
 	var bucket *rateLimit.Bucket
