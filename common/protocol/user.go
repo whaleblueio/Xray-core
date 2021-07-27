@@ -77,8 +77,6 @@ func SetBucket(u *User) {
 			bucket = rateLimit.NewBucketWithQuantum(time.Second, u.SpeedLimiter.Speed, u.SpeedLimiter.Speed/2)
 			buckets.Store(u.Email, bucket)
 			newError(fmt.Sprintf("user:%s speed limit:%d", u.Email, u.SpeedLimiter.Speed)).WriteToLog()
-		} else {
-			newError(fmt.Sprintf("user:%s no speed limit", u.Email)).WriteToLog()
 		}
 	}
 }
