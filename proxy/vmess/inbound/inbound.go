@@ -294,18 +294,14 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	if err != nil {
 		return newError("failed to dispatch request to ", request.Destination()).Base(err)
 	}
-	inboundSession := session.InboundFromContext(ctx)
 	var user *protocol.MemoryUser
-	if request != nil || request.User != nil {
-		user = request.User
-		inboundSession.User = request.User
-	}
+
+	inbound.User = request.User
+	user = request.User
 
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = protocol.GetBucket(user.Email)
-	} else {
-		newError("user is nil").WriteToLog()
 	}
 	requestDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
