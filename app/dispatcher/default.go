@@ -176,7 +176,12 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 			}
 		}
 	} else {
-		newError("user is nil, will not create statLink").WriteToLog(session.ExportIDToError(ctx))
+		if user == nil {
+
+			newError("user is nil, will not create statLink").WriteToLog(session.ExportIDToError(ctx))
+		} else {
+			newError("user's email is empty, will not create statLink").WriteToLog(session.ExportIDToError(ctx))
+		}
 	}
 
 	return inboundLink, outboundLink
