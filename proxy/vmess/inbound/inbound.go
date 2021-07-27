@@ -283,7 +283,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	if inbound == nil {
 		panic("no inbound metadata")
 	}
-
+	inbound.User = request.User
 	sessionPolicy = h.policyManager.ForLevel(request.User.Level)
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -296,8 +296,9 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	}
 	var user *protocol.MemoryUser
 
-	user = request.User
-
+	if request != nil && request.User != nil {
+		user = request.User
+	}
 	var bucket *rateLimit.Bucket
 	if user != nil {
 		bucket = protocol.GetBucket(user.Email)
