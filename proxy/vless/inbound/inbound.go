@@ -211,7 +211,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		request, requestAddons, isfb, err = encoding.DecodeRequestHeader(isfb, first, reader, h.validator)
 	}
 	var user *protocol.MemoryUser
-	if request != nil || request.User != nil {
+	if request != nil && request.User != nil {
 		user = request.User
 	}
 	var bucket *rateLimit.Bucket
