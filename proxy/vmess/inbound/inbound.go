@@ -296,8 +296,9 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	}
 	inboundSession := session.InboundFromContext(ctx)
 	var user *protocol.MemoryUser
-	if request != nil || inboundSession.User != nil {
-		user = inboundSession.User
+	if request != nil || request.User != nil {
+		user = request.User
+		inboundSession.User = request.User
 	}
 
 	var bucket *rateLimit.Bucket
