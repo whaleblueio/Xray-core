@@ -159,6 +159,8 @@ func (d *DefaultDispatcher) getLink(ctx context.Context) (*transport.Link, *tran
 					Counter: c,
 					Writer:  inboundLink.Writer,
 				}
+				newError("user :", user.Email, "setup UserUpLink:", name).WriteToLog(session.ExportIDToError(ctx))
+
 			} else {
 				newError("user :", user.Email, "setup UserUpLink but not found userlink:", name).WriteToLog(session.ExportIDToError(ctx))
 
