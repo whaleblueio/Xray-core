@@ -184,13 +184,13 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		request.Address = net.DomainAddress("v1.mux.cool")
 		request.Port = net.Port(666)
 	}
-	user := request.User
+	//user := request.User
 	var bucket *rateLimit.Bucket
-	if user != nil {
-		bucket = protocol.GetBucket(user.Email)
-	} else {
-		newError("user is nil").WriteToLog()
-	}
+	//if user != nil {
+	//	bucket = protocol.GetBucket(user.Email)
+	//} else {
+	//	newError("user is nil").WriteToLog()
+	//}
 	postRequest := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 

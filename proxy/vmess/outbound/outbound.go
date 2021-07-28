@@ -126,9 +126,9 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		isAEAD = true
 	}
 	var bucket *rateLimit.Bucket
-	if user != nil {
-		bucket = protocol.GetBucket(user.Email)
-	}
+	//if user != nil {
+	//	bucket = protocol.GetBucket(user.Email)
+	//}
 
 	session := encoding.NewClientSession(ctx, isAEAD, protocol.DefaultIDHash)
 	sessionPolicy := h.policyManager.ForLevel(request.User.Level)
