@@ -4,7 +4,6 @@ package outbound
 
 import (
 	"context"
-	rateLimit "github.com/juju/ratelimit"
 	"time"
 
 	"github.com/whaleblueio/Xray-core/common"
@@ -125,7 +124,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	if !aeadDisabled && len(account.AlterIDs) == 0 {
 		isAEAD = true
 	}
-	var bucket *rateLimit.Bucket
+	//var bucket *rateLimit.Bucket
 	//if user != nil {
 	//	bucket = protocol.GetBucket(user.Email)
 	//}
@@ -155,7 +154,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if request.Command == protocol.RequestCommandMux && request.Port == 666 {
 			bodyWriter = xudp.NewPacketWriter(bodyWriter, target)
 		}
-		if err := buf.CopyOnceTimeoutWithLimiter(input, bodyWriter, time.Millisecond*100, bucket); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
+		if err := buf.CopyOnceTimeoutWithLimiter(input, bodyWriter, time.Millisecond*100, nil); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
 			return newError("failed to write first payload").Base(err)
 		}
 
@@ -163,7 +162,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			return err
 		}
 
-		if err := buf.CopyWithLimiter(input, bodyWriter, bucket, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(input, bodyWriter, nil, buf.UpdateActivity(timer)); err != nil {
 			return err
 		}
 
@@ -191,7 +190,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			bodyReader = xudp.NewPacketReader(&buf.BufferedReader{Reader: bodyReader})
 		}
 
-		return buf.CopyWithLimiter(bodyReader, output, bucket, buf.UpdateActivity(timer))
+		return buf.CopyWithLimiter(bodyReader, output, nil, buf.UpdateActivity(timer))
 	}
 
 	var responseDonePost = task.OnSuccess(responseDone, task.Close(output))

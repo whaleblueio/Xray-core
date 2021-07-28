@@ -4,7 +4,6 @@ package outbound
 
 import (
 	"context"
-	rateLimit "github.com/juju/ratelimit"
 	"syscall"
 	"time"
 
@@ -185,7 +184,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		request.Port = net.Port(666)
 	}
 	//user := request.User
-	var bucket *rateLimit.Bucket
+	//var bucket *rateLimit.Bucket
 	//if user != nil {
 	//	bucket = protocol.GetBucket(user.Email)
 	//} else {
@@ -204,7 +203,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if request.Command == protocol.RequestCommandMux && request.Port == 666 {
 			serverWriter = xudp.NewPacketWriter(serverWriter, target)
 		}
-		if err := buf.CopyOnceTimeoutWithLimiter(clientReader, serverWriter, time.Millisecond*100, bucket); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
+		if err := buf.CopyOnceTimeoutWithLimiter(clientReader, serverWriter, time.Millisecond*100, nil); err != nil && err != buf.ErrNotTimeoutReader && err != buf.ErrReadTimeout {
 			return err // ...
 		}
 
@@ -214,7 +213,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		}
 
 		// from clientReader.ReadMultiBuffer to serverWriter.WriteMultiBufer
-		if err := buf.CopyWithLimiter(clientReader, serverWriter, bucket, buf.UpdateActivity(timer)); err != nil {
+		if err := buf.CopyWithLimiter(clientReader, serverWriter, nil, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to transfer request payload").Base(err).AtInfo()
 		}
 
@@ -247,7 +246,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			err = encoding.ReadV(serverReader, clientWriter, timer, iConn.(*xtls.Conn), rawConn, counter, sctx)
 		} else {
 			// from serverReader.ReadMultiBuffer to clientWriter.WriteMultiBufer
-			err = buf.CopyWithLimiter(serverReader, clientWriter, bucket, buf.UpdateActivity(timer))
+			err = buf.CopyWithLimiter(serverReader, clientWriter, nil, buf.UpdateActivity(timer))
 		}
 
 		if err != nil {
