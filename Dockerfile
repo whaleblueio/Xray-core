@@ -18,8 +18,6 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /docker-entrypoint.d/update-config.sh
 RUN chmod +x /entrypoint.sh
-ENV TZ Asia/Shanghai
-RUN apk add tzdata && cp /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone  && apk del tzdata
 
 ENTRYPOINT ["/bin/sh","/entrypoint.sh"]
 CMD ["/usr/bin/xray", "-config" ,"/etc/xray/config.json"]
