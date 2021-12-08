@@ -2,9 +2,6 @@ FROM golang:alpine AS builder
 WORKDIR /
 RUN go env -w GOPRIVATE=github.com/shadowsocks
 
-
-
-
 COPY / /source
 RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
 
@@ -18,6 +15,7 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /docker-entrypoint.d/update-config.sh
 RUN chmod +x /entrypoint.sh
+
 
 ENTRYPOINT ["/bin/sh","/entrypoint.sh"]
 CMD ["/usr/bin/xray", "-config" ,"/etc/xray/config.json"]
