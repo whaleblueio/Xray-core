@@ -1,6 +1,6 @@
 module github.com/whaleblueio/Xray-core
 
-go 1.16
+go 1.17
 
 replace github.com/whaleblueio/Xray-core => ./
 
@@ -28,4 +28,5 @@ require (
 	google.golang.org/grpc v1.36.1
 	google.golang.org/protobuf v1.26.0
 	h12.io/socks v1.0.2
+
 )
