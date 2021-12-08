@@ -3,9 +3,7 @@ WORKDIR /
 RUN go env -w GOPRIVATE=github.com/shadowsocks
 ENV TZ Asia/Shanghai
 
-RUN apk add tzdata && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
-    && echo ${TZ} > /etc/timezone \
-    && apk del tzdata
+
 
 COPY / /source
 RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
@@ -20,7 +18,9 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /docker-entrypoint.d/update-config.sh
 RUN chmod +x /entrypoint.sh
-
+RUN apk add tzdata && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
+    && apk del tzdata
 
 ENTRYPOINT ["/bin/sh","/entrypoint.sh"]
 CMD ["/usr/bin/xray", "-config" ,"/etc/xray/config.json"]
