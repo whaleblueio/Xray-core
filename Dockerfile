@@ -6,7 +6,14 @@ COPY / /source
 RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
 
 FROM alpine
+ENV TZ Asia/Shanghai
+
+RUN apk add tzdata && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
+    && apk del tzdata
+
 WORKDIR /
+
 COPY --from=builder /source/xray /usr/bin/
 RUN apk update  && apk add gettext
 
