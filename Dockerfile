@@ -2,12 +2,11 @@ FROM golang:alpine AS builder
 WORKDIR /
 RUN go env -w GOPRIVATE=github.com/shadowsocks
 
-COPY / /source
-RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
+RUN  go build -o xray -ldflags "-s -w" ./main
 
 FROM alpine
 WORKDIR /
-COPY --from=builder /source/xray /usr/bin/
+COPY --from=builder /xray /usr/bin/
 RUN apk update  && apk add gettext
 
 COPY update_config.sh /docker-entrypoint.d/update-config.sh
