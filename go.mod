@@ -1,6 +1,6 @@
 module github.com/whaleblueio/Xray-core
 
-go 1.16
+go 1.17
 
 replace github.com/whaleblueio/Xray-core => ./
 
@@ -12,7 +12,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/juju/ratelimit v1.0.1
 	github.com/lucas-clemente/quic-go v0.20.0
-	github.com/marten-seemann/qtls-go1-17 v0.1.0 // indirect
+	github.com/marten-seemann/qtls-go1-17 v0.1.0
 	github.com/miekg/dns v1.1.41
 	github.com/pelletier/go-toml v1.8.1
 	github.com/pires/go-proxyproto v0.5.0
