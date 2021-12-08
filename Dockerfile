@@ -1,6 +1,11 @@
 FROM golang:alpine AS builder
 WORKDIR /
 RUN go env -w GOPRIVATE=github.com/shadowsocks
+ENV TZ Asia/Shanghai
+
+RUN apk add tzdata && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
+    && apk del tzdata
 
 COPY / /source
 RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
