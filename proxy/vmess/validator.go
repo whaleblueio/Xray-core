@@ -3,8 +3,6 @@ package vmess
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	logger "github.com/sirupsen/logrus"
-	"golang.org/x/net/html/atom"
 	"hash/crc64"
 	"strings"
 	"sync"
@@ -150,7 +148,6 @@ func (v *TimedUserValidator) Add(u *protocol.MemoryUser) error {
 	var cmdkeyfl [16]byte
 	copy(cmdkeyfl[:], account.ID.CmdKey())
 	v.aeadDecoderHolder.AddUser(cmdkeyfl, u)
-	logger.Debugf("Add() add to Memory account:%s", uu.user.Email)
 	return nil
 }
 
@@ -171,7 +168,7 @@ func (v *TimedUserValidator) Get(userHash []byte) (*protocol.MemoryUser, protoco
 		return nil, 0, false, ErrTainted
 	}
 
-	return nil, 0, false, newError("Not Found", atom.String(userHash))
+	return nil, 0, false, ErrNotFound
 }
 
 func (v *TimedUserValidator) GetAEAD(userHash []byte) (*protocol.MemoryUser, bool, error) {
