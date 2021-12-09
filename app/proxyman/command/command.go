@@ -51,9 +51,6 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 		logger.Warnf("ApplyInbound() request users len=0")
 		return newError("request users len=0").Base(err)
 	}
-	first := op.Users[0]
-	last := op.Users[length-1]
-	logger.Infof("ApplyInbound() tag:%s len:%d first:%d,last:%d", handler.Tag(), length, first.Email, last.Email)
 	var errs []error
 	for _, u := range op.Users {
 		mUser, err := u.ToMemoryUser()
