@@ -53,7 +53,7 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 	}
 	first := op.Users[0]
 	last := op.Users[length-1]
-	logger.Infof("ApplyInbound() len:%d first:%d,last:%d", length, first.Email, last.Email)
+	logger.Infof("ApplyInbound() tag:%s len:%d first:%d,last:%d", handler.Tag(), length, first.Email, last.Email)
 	for _, u := range op.Users {
 		mUser, err := u.ToMemoryUser()
 		if err != nil {

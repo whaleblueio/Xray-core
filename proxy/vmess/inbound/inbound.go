@@ -5,6 +5,7 @@ package inbound
 import (
 	"context"
 	rateLimit "github.com/juju/ratelimit"
+	logger "github.com/sirupsen/logrus"
 	"io"
 	"strings"
 	"sync"
@@ -166,6 +167,7 @@ func (h *Handler) GetUser(email string) *protocol.MemoryUser {
 
 func (h *Handler) AddUser(ctx context.Context, user *protocol.MemoryUser) error {
 	if len(user.Email) > 0 && !h.usersByEmail.Add(user) {
+		logger.Warnf("AddUser() User:%s already exists.", user.Email)
 		return newError("User ", user.Email, " already exists.")
 	}
 	return h.clients.Add(user)
