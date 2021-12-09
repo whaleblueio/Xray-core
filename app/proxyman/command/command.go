@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	logger "github.com/sirupsen/logrus"
 	"github.com/whaleblueio/Xray-core/common/protocol"
 
 	grpc "google.golang.org/grpc"
@@ -43,6 +44,16 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 	if !ok {
 		return newError("proxy is not a UserManager")
 	}
+	length := len(op.Users)
+	if length > 0 {
+
+	} else {
+		logger.Warnf("ApplyInbound() request users len=0")
+		return newError("request users len=0").Base(err)
+	}
+	first := op.Users[0]
+	last := op.Users[length-1]
+	logger.Infof("ApplyInbound() first:%d,last:%d", first.Email, last.Email)
 	for _, u := range op.Users {
 		mUser, err := u.ToMemoryUser()
 		if err != nil {
