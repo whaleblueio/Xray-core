@@ -53,6 +53,7 @@ func (v *userByEmail) addNoLock(u *protocol.MemoryUser) bool {
 	email := strings.ToLower(u.Email)
 	_, found := v.cache[email]
 	if found {
+		v.cache[email] = u
 		return false
 	}
 	v.cache[email] = u
