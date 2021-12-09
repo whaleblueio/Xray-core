@@ -54,16 +54,22 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 	first := op.Users[0]
 	last := op.Users[length-1]
 	logger.Infof("ApplyInbound() tag:%s len:%d first:%d,last:%d", handler.Tag(), length, first.Email, last.Email)
+	var errs []error
 	for _, u := range op.Users {
 		mUser, err := u.ToMemoryUser()
 		if err != nil {
-			return newError("failed to parse user").Base(err)
+			errs = append(errs, err)
+
 		}
 		err = um.AddUser(ctx, mUser)
 		protocol.SetBucket(u)
 		if err != nil {
-			return newError("failed to add user").Base(err)
+			errs = append(errs, err)
+
 		}
+	}
+	if len(errs) > 0 {
+		return newError(errs)
 	}
 
 	return nil
