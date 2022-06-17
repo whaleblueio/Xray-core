@@ -10,8 +10,20 @@ import "common/protocol/user.proto";
 import "common/serial/typed_message.proto";
 import "core/config.proto";
 
+//message ReqListIp{
+//
+//}
+//
+//message RespIp{
+//  repeated Ip connectedIps = 1;
+//}
+//message Ip{
+//  string email = 1;
+//  repeated string ips = 2;
+//}
+
 message AddUserOperation {
- repeated xray.common.protocol.User users = 1;
+  repeated xray.common.protocol.User users = 1;
 }
 
 message RemoveUserOperation {
@@ -68,6 +80,7 @@ service HandlerService {
   rpc RemoveOutbound(RemoveOutboundRequest) returns (RemoveOutboundResponse) {}
 
   rpc AlterOutbound(AlterOutboundRequest) returns (AlterOutboundResponse) {}
+//  rpc ListConnectedIp(ReqListIp) returns (RespIp){}
 }
 
 message Config {}

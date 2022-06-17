@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.25.0
 // 	protoc        v3.14.0
-// source: app/stats/command/command.proto
+// source: command.proto
 
 package command
 
@@ -39,7 +39,7 @@ type GetStatsRequest struct {
 func (x *GetStatsRequest) Reset() {
 	*x = GetStatsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[0]
+		mi := &file_command_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -52,7 +52,7 @@ func (x *GetStatsRequest) String() string {
 func (*GetStatsRequest) ProtoMessage() {}
 
 func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[0]
+	mi := &file_command_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -65,7 +65,7 @@ func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetStatsRequest) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{0}
+	return file_command_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetStatsRequest) GetName() string {
@@ -87,14 +87,15 @@ type Stat struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Value int64  `protobuf:"varint,2,opt,name=value,proto3" json:"value,omitempty"`
+	Name  string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Value int64    `protobuf:"varint,2,opt,name=value,proto3" json:"value,omitempty"`
+	Ips   []string `protobuf:"bytes,3,rep,name=ips,proto3" json:"ips,omitempty"`
 }
 
 func (x *Stat) Reset() {
 	*x = Stat{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[1]
+		mi := &file_command_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -107,7 +108,7 @@ func (x *Stat) String() string {
 func (*Stat) ProtoMessage() {}
 
 func (x *Stat) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[1]
+	mi := &file_command_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -120,7 +121,7 @@ func (x *Stat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stat.ProtoReflect.Descriptor instead.
 func (*Stat) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{1}
+	return file_command_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Stat) GetName() string {
@@ -137,6 +138,13 @@ func (x *Stat) GetValue() int64 {
 	return 0
 }
 
+func (x *Stat) GetIps() []string {
+	if x != nil {
+		return x.Ips
+	}
+	return nil
+}
+
 type GetStatsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -148,7 +156,7 @@ type GetStatsResponse struct {
 func (x *GetStatsResponse) Reset() {
 	*x = GetStatsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[2]
+		mi := &file_command_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -161,7 +169,7 @@ func (x *GetStatsResponse) String() string {
 func (*GetStatsResponse) ProtoMessage() {}
 
 func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[2]
+	mi := &file_command_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -174,7 +182,7 @@ func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetStatsResponse) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{2}
+	return file_command_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetStatsResponse) GetStat() *Stat {
@@ -196,7 +204,7 @@ type QueryStatsRequest struct {
 func (x *QueryStatsRequest) Reset() {
 	*x = QueryStatsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[3]
+		mi := &file_command_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -209,7 +217,7 @@ func (x *QueryStatsRequest) String() string {
 func (*QueryStatsRequest) ProtoMessage() {}
 
 func (x *QueryStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[3]
+	mi := &file_command_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -222,7 +230,7 @@ func (x *QueryStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QueryStatsRequest.ProtoReflect.Descriptor instead.
 func (*QueryStatsRequest) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{3}
+	return file_command_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *QueryStatsRequest) GetPattern() string {
@@ -250,7 +258,7 @@ type QueryStatsResponse struct {
 func (x *QueryStatsResponse) Reset() {
 	*x = QueryStatsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[4]
+		mi := &file_command_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -263,7 +271,7 @@ func (x *QueryStatsResponse) String() string {
 func (*QueryStatsResponse) ProtoMessage() {}
 
 func (x *QueryStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[4]
+	mi := &file_command_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -276,7 +284,7 @@ func (x *QueryStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QueryStatsResponse.ProtoReflect.Descriptor instead.
 func (*QueryStatsResponse) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{4}
+	return file_command_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *QueryStatsResponse) GetStat() []*Stat {
@@ -295,7 +303,7 @@ type SysStatsRequest struct {
 func (x *SysStatsRequest) Reset() {
 	*x = SysStatsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[5]
+		mi := &file_command_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -308,7 +316,7 @@ func (x *SysStatsRequest) String() string {
 func (*SysStatsRequest) ProtoMessage() {}
 
 func (x *SysStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[5]
+	mi := &file_command_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -321,7 +329,7 @@ func (x *SysStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SysStatsRequest.ProtoReflect.Descriptor instead.
 func (*SysStatsRequest) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{5}
+	return file_command_proto_rawDescGZIP(), []int{5}
 }
 
 type SysStatsResponse struct {
@@ -344,7 +352,7 @@ type SysStatsResponse struct {
 func (x *SysStatsResponse) Reset() {
 	*x = SysStatsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[6]
+		mi := &file_command_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -357,7 +365,7 @@ func (x *SysStatsResponse) String() string {
 func (*SysStatsResponse) ProtoMessage() {}
 
 func (x *SysStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[6]
+	mi := &file_command_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -370,7 +378,7 @@ func (x *SysStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SysStatsResponse.ProtoReflect.Descriptor instead.
 func (*SysStatsResponse) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{6}
+	return file_command_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SysStatsResponse) GetNumGoroutine() uint32 {
@@ -452,7 +460,7 @@ type Config struct {
 func (x *Config) Reset() {
 	*x = Config{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_app_stats_command_command_proto_msgTypes[7]
+		mi := &file_command_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -465,7 +473,7 @@ func (x *Config) String() string {
 func (*Config) ProtoMessage() {}
 
 func (x *Config) ProtoReflect() protoreflect.Message {
-	mi := &file_app_stats_command_command_proto_msgTypes[7]
+	mi := &file_command_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -478,23 +486,23 @@ func (x *Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Config.ProtoReflect.Descriptor instead.
 func (*Config) Descriptor() ([]byte, []int) {
-	return file_app_stats_command_command_proto_rawDescGZIP(), []int{7}
+	return file_command_proto_rawDescGZIP(), []int{7}
 }
 
-var File_app_stats_command_command_proto protoreflect.FileDescriptor
+var File_command_proto protoreflect.FileDescriptor
 
-var file_app_stats_command_command_proto_rawDesc = []byte{
-	0x0a, 0x1f, 0x61, 0x70, 0x70, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2f, 0x63, 0x6f, 0x6d, 0x6d,
-	0x61, 0x6e, 0x64, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x12, 0x16, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x73, 0x74, 0x61, 0x74,
-	0x73, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x22, 0x3b, 0x0a, 0x0f, 0x47, 0x65, 0x74,
-	0x53, 0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04,
+var file_command_proto_rawDesc = []byte{
+	0x0a, 0x0d, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
+	0x16, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x22, 0x3b, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x53, 0x74,
+	0x61, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14,
+	0x0a, 0x05, 0x72, 0x65, 0x73, 0x65, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x72,
+	0x65, 0x73, 0x65, 0x74, 0x22, 0x42, 0x0a, 0x04, 0x53, 0x74, 0x61, 0x74, 0x12, 0x12, 0x0a, 0x04,
 	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
-	0x12, 0x14, 0x0a, 0x05, 0x72, 0x65, 0x73, 0x65, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52,
-	0x05, 0x72, 0x65, 0x73, 0x65, 0x74, 0x22, 0x30, 0x0a, 0x04, 0x53, 0x74, 0x61, 0x74, 0x12, 0x12,
-	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
-	0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x03, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x44, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53,
+	0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x69, 0x70, 0x73, 0x18, 0x03, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x03, 0x69, 0x70, 0x73, 0x22, 0x44, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53,
 	0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x30, 0x0a, 0x04,
 	0x73, 0x74, 0x61, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x78, 0x72, 0x61,
 	0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
@@ -547,30 +555,30 @@ var file_app_stats_command_command_proto_rawDesc = []byte{
 	0x79, 0x73, 0x53, 0x74, 0x61, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28,
 	0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2e,
 	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x2e, 0x53, 0x79, 0x73, 0x53, 0x74, 0x61, 0x74, 0x73,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x64, 0x0a, 0x1a, 0x63, 0x6f,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x6b, 0x0a, 0x1a, 0x63, 0x6f,
 	0x6d, 0x2e, 0x78, 0x72, 0x61, 0x79, 0x2e, 0x61, 0x70, 0x70, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x73,
-	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x50, 0x01, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x78, 0x74, 0x6c, 0x73, 0x2f, 0x78, 0x72, 0x61, 0x79,
-	0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x70, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2f,
-	0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0xaa, 0x02, 0x16, 0x58, 0x72, 0x61, 0x79, 0x2e, 0x41,
-	0x70, 0x70, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x73, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x50, 0x01, 0x5a, 0x32, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x77, 0x68, 0x61, 0x6c, 0x65, 0x62, 0x6c, 0x75, 0x65,
+	0x69, 0x6f, 0x2f, 0x58, 0x72, 0x61, 0x79, 0x2d, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x61, 0x70, 0x70,
+	0x2f, 0x73, 0x74, 0x61, 0x74, 0x73, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0xaa, 0x02,
+	0x16, 0x58, 0x72, 0x61, 0x79, 0x2e, 0x41, 0x70, 0x70, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x73, 0x2e,
+	0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_app_stats_command_command_proto_rawDescOnce sync.Once
-	file_app_stats_command_command_proto_rawDescData = file_app_stats_command_command_proto_rawDesc
+	file_command_proto_rawDescOnce sync.Once
+	file_command_proto_rawDescData = file_command_proto_rawDesc
 )
 
-func file_app_stats_command_command_proto_rawDescGZIP() []byte {
-	file_app_stats_command_command_proto_rawDescOnce.Do(func() {
-		file_app_stats_command_command_proto_rawDescData = protoimpl.X.CompressGZIP(file_app_stats_command_command_proto_rawDescData)
+func file_command_proto_rawDescGZIP() []byte {
+	file_command_proto_rawDescOnce.Do(func() {
+		file_command_proto_rawDescData = protoimpl.X.CompressGZIP(file_command_proto_rawDescData)
 	})
-	return file_app_stats_command_command_proto_rawDescData
+	return file_command_proto_rawDescData
 }
 
-var file_app_stats_command_command_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_app_stats_command_command_proto_goTypes = []interface{}{
+var file_command_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_command_proto_goTypes = []interface{}{
 	(*GetStatsRequest)(nil),    // 0: xray.app.stats.command.GetStatsRequest
 	(*Stat)(nil),               // 1: xray.app.stats.command.Stat
 	(*GetStatsResponse)(nil),   // 2: xray.app.stats.command.GetStatsResponse
@@ -580,7 +588,7 @@ var file_app_stats_command_command_proto_goTypes = []interface{}{
 	(*SysStatsResponse)(nil),   // 6: xray.app.stats.command.SysStatsResponse
 	(*Config)(nil),             // 7: xray.app.stats.command.Config
 }
-var file_app_stats_command_command_proto_depIdxs = []int32{
+var file_command_proto_depIdxs = []int32{
 	1, // 0: xray.app.stats.command.GetStatsResponse.stat:type_name -> xray.app.stats.command.Stat
 	1, // 1: xray.app.stats.command.QueryStatsResponse.stat:type_name -> xray.app.stats.command.Stat
 	0, // 2: xray.app.stats.command.StatsService.GetStats:input_type -> xray.app.stats.command.GetStatsRequest
@@ -596,13 +604,13 @@ var file_app_stats_command_command_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_app_stats_command_command_proto_init() }
-func file_app_stats_command_command_proto_init() {
-	if File_app_stats_command_command_proto != nil {
+func init() { file_command_proto_init() }
+func file_command_proto_init() {
+	if File_command_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_app_stats_command_command_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetStatsRequest); i {
 			case 0:
 				return &v.state
@@ -614,7 +622,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Stat); i {
 			case 0:
 				return &v.state
@@ -626,7 +634,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetStatsResponse); i {
 			case 0:
 				return &v.state
@@ -638,7 +646,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryStatsRequest); i {
 			case 0:
 				return &v.state
@@ -650,7 +658,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QueryStatsResponse); i {
 			case 0:
 				return &v.state
@@ -662,7 +670,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SysStatsRequest); i {
 			case 0:
 				return &v.state
@@ -674,7 +682,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SysStatsResponse); i {
 			case 0:
 				return &v.state
@@ -686,7 +694,7 @@ func file_app_stats_command_command_proto_init() {
 				return nil
 			}
 		}
-		file_app_stats_command_command_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_command_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Config); i {
 			case 0:
 				return &v.state
@@ -703,18 +711,18 @@ func file_app_stats_command_command_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_app_stats_command_command_proto_rawDesc,
+			RawDescriptor: file_command_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_app_stats_command_command_proto_goTypes,
-		DependencyIndexes: file_app_stats_command_command_proto_depIdxs,
-		MessageInfos:      file_app_stats_command_command_proto_msgTypes,
+		GoTypes:           file_command_proto_goTypes,
+		DependencyIndexes: file_command_proto_depIdxs,
+		MessageInfos:      file_command_proto_msgTypes,
 	}.Build()
-	File_app_stats_command_command_proto = out.File
-	file_app_stats_command_command_proto_rawDesc = nil
-	file_app_stats_command_command_proto_goTypes = nil
-	file_app_stats_command_command_proto_depIdxs = nil
+	File_command_proto = out.File
+	file_command_proto_rawDesc = nil
+	file_command_proto_goTypes = nil
+	file_command_proto_depIdxs = nil
 }

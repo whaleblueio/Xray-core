@@ -1,6 +1,8 @@
 package stats
 
-import "sync/atomic"
+import (
+	"sync/atomic"
+)
 
 // Counter is an implementation of stats.Counter.
 type Counter struct {

@@ -160,6 +160,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	}
 	var bucket *rateLimit.Bucket
 	if user != nil {
+		//user.IpCounter.Add(string(dialer.Address().IP()))
 		bucket = protocol.GetBucket(user.Email)
 	} else {
 		newError("user is nil").WriteToLog()
