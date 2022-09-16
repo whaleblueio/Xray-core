@@ -1,11 +1,11 @@
 package vless
 
 import (
-	"strings"
-	"sync"
-
+	"github.com/prometheus/common/log"
 	"github.com/whaleblueio/Xray-core/common/protocol"
 	"github.com/whaleblueio/Xray-core/common/uuid"
+	"strings"
+	"sync"
 )
 
 // Validator stores valid VLESS users.
@@ -20,7 +20,8 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 	if u.Email != "" {
 		_, loaded := v.email.LoadOrStore(strings.ToLower(u.Email), u)
 		if loaded {
-			return newError("User ", u.Email, " already exists.")
+			log.Warnf("User %s  already exists.", u.Email)
+			return nil
 		}
 	}
 	v.users.Store(u.Account.(*MemoryAccount).ID.UUID(), u)
