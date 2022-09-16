@@ -2,6 +2,7 @@ package shadowsocks
 
 import (
 	"crypto/cipher"
+	logger "github.com/sirupsen/logrus"
 	"strings"
 	"sync"
 
@@ -26,7 +27,8 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 	if u.Email != "" {
 		_, loaded := v.email.LoadOrStore(strings.ToLower(u.Email), u)
 		if loaded {
-			return newError("User ", u.Email, " already exists.")
+			logger.Warnf("User %s  already exists.", u.Email)
+			return nil
 		}
 	}
 
