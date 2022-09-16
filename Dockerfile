@@ -3,7 +3,7 @@ WORKDIR /
 RUN go env -w GOPRIVATE=github.com/shadowsocks
 
 COPY / /source
-RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
+RUN cd /source &&  go build -o xray -ldflags  -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn "-s -w" ./main
 
 FROM alpine
 ENV TZ Asia/Shanghai

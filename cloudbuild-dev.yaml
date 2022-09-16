@@ -1,6 +1,6 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build',"-ldflags","-X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn", '-t', 'gcr.io/$PROJECT_ID/xray-core-dev:$COMMIT_SHA', '.' ]
+    args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/xray-core-dev:$COMMIT_SHA', '.' ]
     id: build_image
   - name: 'gcr.io/cloud-builders/docker'
     args: [  'tag', 'gcr.io/$PROJECT_ID/xray-core-dev:$COMMIT_SHA', 'gcr.io/$PROJECT_ID/xray-core-dev:latest' ]
