@@ -3,6 +3,7 @@ package protocol
 import (
 	"fmt"
 	rateLimit "github.com/juju/ratelimit"
+	"strings"
 	"sync"
 	"time"
 )
@@ -30,23 +31,60 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	ipCounter := new(IpCounter)
 	return &MemoryUser{
-		Account: account,
-		Email:   u.Email,
-		Level:   u.Level,
+		Account:   account,
+		Email:     u.Email,
+		Level:     u.Level,
+		IpCounter: ipCounter,
 	}, nil
 }
 
 // MemoryUser is a parsed form of User, to reduce number of parsing of Account proto.
 type MemoryUser struct {
 	// Account is the parsed account of the protocol.
-	Account Account
-	Email   string
-	Level   uint32
+	Account   Account
+	Email     string
+	Level     uint32
+	IpCounter *IpCounter
 }
 
 var buckets sync.Map
+
+var connectedIps sync.Map
+
+func AddIp(email string, ip string) {
+	c, ok := connectedIps.Load(email)
+	if ok {
+		counter := c.(*IpCounter)
+		counter.Add(ip)
+	} else {
+		counter := &IpCounter{}
+		counter.Add(ip)
+	}
+}
+
+func GetIPs(email string) []string {
+	var ips []string
+	connectedIps.Range(func(key, value interface{}) bool {
+		if strings.Contains(email, key.(string)) {
+			c := value.(*IpCounter)
+
+			for k, ip := range c.IpTable {
+				interval := time.Now().Unix() - ip.Time
+				//over 1 minutes not update ,will delete
+				if interval > 1*60 {
+					delete(c.IpTable, k)
+				} else {
+					ips = append(ips, k)
+				}
+			}
+
+		}
+		return true
+	})
+	return ips
+}
 
 func GetBucket(email string) *rateLimit.Bucket {
 	b, ok := buckets.Load(email)

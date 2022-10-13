@@ -167,7 +167,8 @@ func (h *Handler) GetUser(email string) *protocol.MemoryUser {
 
 func (h *Handler) AddUser(ctx context.Context, user *protocol.MemoryUser) error {
 	if len(user.Email) > 0 && !h.usersByEmail.Add(user) {
-		logger.Warnf("AddUser() User:%s already exists,will update.", user.Email)
+		logger.Warnf("AddUser() User:%s already exists.", user.Email)
+		return nil
 	}
 	return h.clients.Add(user)
 }

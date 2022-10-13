@@ -4,6 +4,9 @@ package command
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
+	"github.com/whaleblueio/Xray-core/common/protocol"
+	"regexp"
 	"runtime"
 	"time"
 
@@ -40,6 +43,7 @@ func (s *statsServer) GetStats(ctx context.Context, request *GetStatsRequest) (*
 	} else {
 		value = c.Value()
 	}
+
 	return &GetStatsResponse{
 		Stat: &Stat{
 			Name:  request.Name,
@@ -53,13 +57,13 @@ func (s *statsServer) QueryStats(ctx context.Context, request *QueryStatsRequest
 	if err != nil {
 		return nil, err
 	}
-
 	response := &QueryStatsResponse{}
 
 	manager, ok := s.stats.(*stats.Manager)
 	if !ok {
 		return nil, newError("QueryStats only works its own stats.Manager.")
 	}
+	reg := regexp.MustCompile("[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(v2rayService.com)?")
 
 	manager.VisitCounters(func(name string, c feature_stats.Counter) bool {
 		if matcher.Match(name) {
@@ -69,9 +73,16 @@ func (s *statsServer) QueryStats(ctx context.Context, request *QueryStatsRequest
 			} else {
 				value = c.Value()
 			}
+			email := reg.FindString(name)
+			var ips []string
+			logrus.Infof("QueryStats get user connected ips:%s", email)
+			if err == nil {
+				ips = protocol.GetIPs(email)
+			}
 			response.Stat = append(response.Stat, &Stat{
 				Name:  name,
 				Value: value,
+				Ips:   ips,
 			})
 		}
 		return true

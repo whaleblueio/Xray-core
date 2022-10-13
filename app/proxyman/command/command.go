@@ -62,7 +62,6 @@ func (op *AddUserOperation) ApplyInbound(ctx context.Context, handler inbound.Ha
 		protocol.SetBucket(u)
 		if err != nil {
 			errs = append(errs, err)
-
 		}
 	}
 	if len(errs) > 0 {

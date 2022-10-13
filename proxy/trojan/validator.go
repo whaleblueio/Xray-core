@@ -1,7 +1,7 @@
 package trojan
 
 import (
-	"github.com/prometheus/common/log"
+	logger "github.com/sirupsen/logrus"
 	"strings"
 	"sync"
 
@@ -20,7 +20,7 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 	if u.Email != "" {
 		_, loaded := v.email.LoadOrStore(strings.ToLower(u.Email), u)
 		if loaded {
-			log.Warnf("User %s  already exists.", u.Email)
+			logger.Warnf("User %s  already exists.", u.Email)
 			return nil
 		}
 	}
