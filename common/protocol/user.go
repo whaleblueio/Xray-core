@@ -32,6 +32,7 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 		return nil, err
 	}
 	ipCounter := new(IpCounter)
+	ipCounter.IpTable = make(map[string]*ConnIP)
 	return &MemoryUser{
 		Account:   account,
 		Email:     u.Email,
