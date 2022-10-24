@@ -102,6 +102,7 @@ func isValidAddress(addr *net.IPOrDomain) bool {
 // Process implements proxy.Outbound.
 func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer internet.Dialer) error {
 	outbound := session.OutboundFromContext(ctx)
+
 	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified.")
 	}
@@ -118,11 +119,11 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 			UDPOverride.Port = destination.Port
 		}
 	}
-	newError("opening connection to ", destination, " sequeceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
+	inboundSession := session.InboundFromContext(ctx)
+	newError(" from:", inboundSession.Source.Address.IP().String(), "opening connection to ", destination, " sequeceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 
 	input := link.Reader
 	output := link.Writer
-
 	var conn internet.Connection
 	err := retry.ExponentialBackoff(5, 100).On(func() error {
 		dialDest := destination
@@ -153,8 +154,9 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 	plcy := h.policy()
 	ctx, cancel := context.WithCancel(ctx)
 	timer := signal.CancelAfterInactivity(ctx, cancel, plcy.Timeouts.ConnectionIdle)
-	inboundSession := session.InboundFromContext(ctx)
+
 	var user *protocol.MemoryUser
+
 	if inboundSession != nil || inboundSession.User != nil {
 		user = inboundSession.User
 	}
@@ -178,6 +180,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.CopyWithLimiter(input, writer, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process request").Base(err)
 		}
+		user.IpCounter.Add(inboundSession.Source.Address.IP().String())
 		return nil
 	}
 
@@ -193,7 +196,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		if err := buf.CopyWithLimiter(reader, output, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to process response").Base(err)
 		}
-
+		user.IpCounter.Add(inboundSession.Source.Address.IP().String())
 		return nil
 	}
 

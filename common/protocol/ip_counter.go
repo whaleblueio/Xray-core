@@ -7,10 +7,10 @@ import (
 
 type IpCounter struct {
 	ipTableLock sync.Mutex
-	IpTable     map[string]*Connected
+	IpTable     map[string]*ConnIP
 }
 
-type Connected struct {
+type ConnIP struct {
 	IP   string
 	Time int64
 }
@@ -24,7 +24,7 @@ func (c *IpCounter) Add(ip string) {
 		connected.Time = time.Now().Unix()
 		return
 	}
-	c.IpTable[ip] = &Connected{
+	c.IpTable[ip] = &ConnIP{
 		IP:   ip,
 		Time: time.Now().Unix(),
 	}
@@ -40,4 +40,12 @@ func (c *IpCounter) Del(ip string) {
 		return
 	}
 	delete(c.IpTable, ip)
+}
+
+func (c *IpCounter) getIP(ip string) *ConnIP {
+	IPCon, found := c.IpTable[ip]
+	if !found {
+		return IPCon
+	}
+	return nil
 }

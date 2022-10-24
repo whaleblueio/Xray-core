@@ -64,6 +64,15 @@ func AddIp(email string, ip string) {
 	}
 }
 
+func GetIPConn(email string, ip string) *ConnIP {
+	c, ok := connectedIps.Load(email)
+	if ok {
+		counter := c.(*IpCounter)
+		return counter.getIP(ip)
+	}
+	return nil
+}
+
 func GetIPs(email string) []string {
 	var ips []string
 	connectedIps.Range(func(key, value interface{}) bool {
@@ -73,8 +82,8 @@ func GetIPs(email string) []string {
 			for k, ip := range c.IpTable {
 				interval := time.Now().Unix() - ip.Time
 				//over 1 minutes not update ,will delete
-				if interval > 1*60 {
-					delete(c.IpTable, k)
+				if interval > 1*30 {
+					c.Del(ip.IP)
 				} else {
 					ips = append(ips, k)
 				}
