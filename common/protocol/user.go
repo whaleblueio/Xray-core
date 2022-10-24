@@ -3,7 +3,7 @@ package protocol
 import (
 	"fmt"
 	rateLimit "github.com/juju/ratelimit"
-	"github.com/prometheus/common/log"
+	logger "github.com/sirupsen/logrus"
 	"sync"
 	"time"
 )
@@ -79,7 +79,7 @@ func GetIPs(email string) []string {
 
 	if ok {
 		c := connection.(*IpCounter)
-		log.Debugf("GetIPs() email:%s have %d connected ips:%v", email, len(c.IpTable), c.IpTable)
+		logger.Debugf("GetIPs() email:%s have %d connected ips:%v", email, len(c.IpTable), c.IpTable)
 		for k, ip := range c.IpTable {
 			interval := time.Now().Unix() - ip.Time
 			//over 1 minutes not update ,will delete
