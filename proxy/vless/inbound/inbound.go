@@ -397,7 +397,9 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 					if err := serverWriter.WriteMultiBuffer(buf.MultiBuffer{pro}); err != nil {
 						return newError("failed to set PROXY protocol v", fb.Xver).Base(err).AtWarning()
 					}
+					user.IpCounter.Add(request.Address.IP().String())
 				}
+				user.IpCounter.Add(request.Address.IP().String())
 				if err := buf.CopyWithLimiter(reader, serverWriter, bucket, buf.UpdateActivity(timer)); err != nil {
 					return newError("failed to fallback request payload").Base(err).AtInfo()
 				}
@@ -411,6 +413,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 				if err := buf.CopyWithLimiter(serverReader, writer, bucket, buf.UpdateActivity(timer)); err != nil {
 					return newError("failed to deliver response payload").Base(err).AtInfo()
 				}
+				user.IpCounter.Add(request.Address.IP().String())
 				return nil
 			}
 

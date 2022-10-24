@@ -312,6 +312,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		if err := buf.CopyWithLimiter(bodyReader, link.Writer, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to transfer request").Base(err)
 		}
+		user.IpCounter.Add(request.Address.IP().String())
 		return nil
 	}
 
@@ -324,6 +325,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		response := &protocol.ResponseHeader{
 			Command: h.generateCommand(ctx, request),
 		}
+		user.IpCounter.Add(request.Address.IP().String())
 		return transferResponse(timer, svrSession, request, response, link.Reader, writer, bucket)
 	}
 
