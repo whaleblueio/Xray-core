@@ -149,7 +149,7 @@ func (v *TimedUserValidator) Add(u *protocol.MemoryUser) error {
 	var cmdkeyfl [16]byte
 	copy(cmdkeyfl[:], account.ID.CmdKey())
 	v.aeadDecoderHolder.AddUser(cmdkeyfl, u)
-	logger.Infof("Add() add to Memory account:%s，lastSec:%d", uu.user.Email, uu.lastSec)
+	logger.Debugf("Add() add to Memory account:%s，lastSec:%d", uu.user.Email, uu.lastSec)
 	return nil
 }
 

@@ -75,7 +75,7 @@ func (s *statsServer) QueryStats(ctx context.Context, request *QueryStatsRequest
 			}
 			email := reg.FindString(name)
 			ips := protocol.GetIPs(email)
-			logrus.Infof("QueryStats get user connected ips:%s", email)
+			logrus.Debugf("QueryStats get user:%s connected ips:%s", email, len(ips))
 			response.Stat = append(response.Stat, &Stat{
 				Name:  name,
 				Value: value,

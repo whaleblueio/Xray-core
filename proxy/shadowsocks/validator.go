@@ -27,7 +27,7 @@ func (v *Validator) Add(u *protocol.MemoryUser) error {
 	if u.Email != "" {
 		_, loaded := v.email.LoadOrStore(strings.ToLower(u.Email), u)
 		if loaded {
-			logger.Warnf("User %s  already exists.", u.Email)
+			logger.Debugf("User %s  already exists.", u.Email)
 			return nil
 		}
 	}

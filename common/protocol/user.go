@@ -75,9 +75,7 @@ func GetIPConn(email string, ip string) *ConnIP {
 
 func GetIPs(email string) []string {
 	var ips []string
-	connection, ok := connections.Load(email)
-
-	if ok {
+	if connection, ok := connections.Load(email); ok {
 		c := connection.(*IpCounter)
 		logger.Debugf("GetIPs() email:%s have %d connected ips:%v", email, len(c.IpTable), c.IpTable)
 		for k, ip := range c.IpTable {
@@ -89,6 +87,8 @@ func GetIPs(email string) []string {
 				ips = append(ips, k)
 			}
 		}
+	} else {
+		logger.Debugf("GetIPs() email:%s do not have ip connected", email)
 	}
 	return ips
 }
