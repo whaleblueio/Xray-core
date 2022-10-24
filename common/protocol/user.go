@@ -3,7 +3,7 @@ package protocol
 import (
 	"fmt"
 	rateLimit "github.com/juju/ratelimit"
-	"strings"
+	"github.com/prometheus/common/log"
 	"sync"
 	"time"
 )
@@ -51,10 +51,10 @@ type MemoryUser struct {
 
 var buckets sync.Map
 
-var connectedIps sync.Map
+var connections sync.Map
 
 func AddIp(email string, ip string) {
-	c, ok := connectedIps.Load(email)
+	c, ok := connections.Load(email)
 	if ok {
 		counter := c.(*IpCounter)
 		counter.Add(ip)
@@ -65,7 +65,7 @@ func AddIp(email string, ip string) {
 }
 
 func GetIPConn(email string, ip string) *ConnIP {
-	c, ok := connectedIps.Load(email)
+	c, ok := connections.Load(email)
 	if ok {
 		counter := c.(*IpCounter)
 		return counter.getIP(ip)
@@ -75,23 +75,21 @@ func GetIPConn(email string, ip string) *ConnIP {
 
 func GetIPs(email string) []string {
 	var ips []string
-	connectedIps.Range(func(key, value interface{}) bool {
-		if strings.Contains(email, key.(string)) {
-			c := value.(*IpCounter)
+	connection, ok := connections.Load(email)
 
-			for k, ip := range c.IpTable {
-				interval := time.Now().Unix() - ip.Time
-				//over 1 minutes not update ,will delete
-				if interval > 1*30 {
-					c.Del(ip.IP)
-				} else {
-					ips = append(ips, k)
-				}
+	if ok {
+		c := connection.(*IpCounter)
+		log.Debugf("GetIPs() email:%s have %d connected ips:%v", email, len(c.IpTable), c.IpTable)
+		for k, ip := range c.IpTable {
+			interval := time.Now().Unix() - ip.Time
+			//over 1 minutes not update ,will delete
+			if interval > 1*30 {
+				c.Del(ip.IP)
+			} else {
+				ips = append(ips, k)
 			}
-
 		}
-		return true
-	})
+	}
 	return ips
 }
 
