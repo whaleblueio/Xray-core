@@ -120,7 +120,7 @@ func (h *Handler) Process(ctx context.Context, link *transport.Link, dialer inte
 		}
 	}
 	inboundSession := session.InboundFromContext(ctx)
-	newError(" from:", inboundSession.Source.Address.IP().String(), "opening connection to ", destination, " sequeceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
+	newError(" from:", inboundSession.Source.Address.IP().String(), " opening connection to ", destination, " sequeceId:", common.GetSequenceId()).WriteToLog(session.ExportIDToError(ctx))
 
 	input := link.Reader
 	output := link.Writer
