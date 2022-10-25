@@ -24,7 +24,7 @@ func (c *IpCounter) Add(ip string) {
 		connected.Time = time.Now().Unix()
 		return
 	} else {
-		newError("Add() ip ", ip, " create ConnIP").WriteToLog()
+		newError("Add() ip ", ip, " create ConnIP", " counter pointer:", &c).WriteToLog()
 		c.IpTable[ip] = &ConnIP{
 			IP:   ip,
 			Time: time.Now().Unix(),
