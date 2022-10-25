@@ -30,10 +30,14 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	ipCounter := &IpCounter{
-		IpTable: make(map[string]*ConnIP),
+
+	ipCounter := GetIPCounter(u.Email)
+	if ipCounter == nil {
+		ipCounter = &IpCounter{
+			IpTable: make(map[string]*ConnIP),
+		}
+		AddIp(u.Email, ipCounter)
 	}
-	AddIp(u.Email, ipCounter)
 	return &MemoryUser{
 		Account:   account,
 		Email:     u.Email,
@@ -58,6 +62,14 @@ var connections sync.Map
 func AddIp(email string, ipCounter *IpCounter) {
 
 	connections.Store(email, ipCounter)
+}
+func GetIPCounter(email string) *IpCounter {
+
+	if c, ok := connections.Load(email); ok {
+		return c.(*IpCounter)
+	} else {
+		return nil
+	}
 }
 
 func GetIPs(email string) []string {
