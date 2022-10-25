@@ -35,6 +35,7 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if ipCounter == nil {
 		ipCounter = &IpCounter{
 			IpTable: make(map[string]*ConnIP),
+			Email:   u.Email,
 		}
 		AddIp(u.Email, ipCounter)
 	}

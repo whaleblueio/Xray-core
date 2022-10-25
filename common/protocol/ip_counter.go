@@ -8,6 +8,7 @@ import (
 type IpCounter struct {
 	ipTableLock sync.Mutex
 	IpTable     map[string]*ConnIP
+	Email       string
 }
 
 type ConnIP struct {
@@ -20,11 +21,11 @@ func (c *IpCounter) Add(ip string) {
 	c.ipTableLock.Lock()
 	defer c.ipTableLock.Unlock()
 	if connected, found := c.IpTable[ip]; found {
-		newError("Add() ip ", ip, " update timestamp").WriteToLog()
+		newError("Add() email:", c.Email, " ip ", ip, " update timestamp").WriteToLog()
 		connected.Time = time.Now().Unix()
 		return
 	} else {
-		newError("Add() ip ", ip, " create ConnIP", " counter pointer:", &c).WriteToLog()
+		newError("Add() email:", c.Email, " ip ", ip, " create ConnIP", " counter pointer:", &c).WriteToLog()
 		c.IpTable[ip] = &ConnIP{
 			IP:   ip,
 			Time: time.Now().Unix(),
