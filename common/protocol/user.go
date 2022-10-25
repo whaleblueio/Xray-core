@@ -31,8 +31,10 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	ipCounter := new(IpCounter)
-	ipCounter.IpTable = make(map[string]*ConnIP)
+	ipCounter := &IpCounter{
+		IpTable: make(map[string]*ConnIP),
+	}
+	AddIp(u.Email, ipCounter)
 	return &MemoryUser{
 		Account:   account,
 		Email:     u.Email,
@@ -54,24 +56,8 @@ var buckets sync.Map
 
 var connections sync.Map
 
-func AddIp(email string, ip string) {
-	c, ok := connections.Load(email)
-	if ok {
-		counter := c.(*IpCounter)
-		counter.Add(ip)
-	} else {
-		counter := &IpCounter{}
-		counter.Add(ip)
-	}
-}
-
-func GetIPConn(email string, ip string) *ConnIP {
-	c, ok := connections.Load(email)
-	if ok {
-		counter := c.(*IpCounter)
-		return counter.getIP(ip)
-	}
-	return nil
+func AddIp(email string, ipCounter *IpCounter) {
+	connections.Store(email, ipCounter)
 }
 
 func GetIPs(email string) []string {
