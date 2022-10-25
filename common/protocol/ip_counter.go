@@ -19,15 +19,18 @@ type ConnIP struct {
 func (c *IpCounter) Add(ip string) {
 	c.ipTableLock.Lock()
 	defer c.ipTableLock.Unlock()
-	connected, found := c.IpTable[ip]
-	if found {
+	if connected, found := c.IpTable[ip]; found {
+		newError("Add() ip ", ip, " update timestamp").WriteToLog()
 		connected.Time = time.Now().Unix()
 		return
+	} else {
+		newError("Add() ip ", ip, " create ConnIP").WriteToLog()
+		c.IpTable[ip] = &ConnIP{
+			IP:   ip,
+			Time: time.Now().Unix(),
+		}
 	}
-	c.IpTable[ip] = &ConnIP{
-		IP:   ip,
-		Time: time.Now().Unix(),
-	}
+
 }
 
 // Del implements stats.IpCounter.

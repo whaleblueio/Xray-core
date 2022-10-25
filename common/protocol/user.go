@@ -63,7 +63,7 @@ func GetIPs(email string) []string {
 	var ips []string
 	if connection, ok := connections.Load(email); ok {
 		c := connection.(*IpCounter)
-		newError("GetIPs() email:", email, "have", len(c.IpTable), " connected ips:", c.IpTable).WriteToLog()
+		newError("GetIPs() email:", email, "have ", len(c.IpTable), "connections, connected ips:", c.IpTable).WriteToLog()
 		for k, ip := range c.IpTable {
 			interval := time.Now().Unix() - ip.Time
 			//over 1 minutes not update ,will delete
