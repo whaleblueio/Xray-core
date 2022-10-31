@@ -3,7 +3,7 @@ WORKDIR /
 RUN go env -w GOPRIVATE=github.com/shadowsocks
 
 COPY / /source
-RUN cd /source &&  go build -o xray -ldflags "-s -w" ./main
+RUN cd /source &&  go build -o xray  ./main
 
 FROM alpine
 ENV TZ Asia/Shanghai

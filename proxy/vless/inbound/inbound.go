@@ -204,7 +204,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 
 	napfb := h.fallbacks
 	isfb := napfb != nil
-
+	inbound := session.InboundFromContext(ctx)
 	if isfb && firstLen < 18 {
 		err = newError("fallback directly")
 	} else {
@@ -401,6 +401,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 				if err := buf.CopyWithLimiter(reader, serverWriter, bucket, buf.UpdateActivity(timer)); err != nil {
 					return newError("failed to fallback request payload").Base(err).AtInfo()
 				}
+				user.IpCounter.Add(inbound.Source.Address.IP().String())
 				return nil
 			}
 
@@ -411,12 +412,14 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 				if err := buf.CopyWithLimiter(serverReader, writer, bucket, buf.UpdateActivity(timer)); err != nil {
 					return newError("failed to deliver response payload").Base(err).AtInfo()
 				}
+				user.IpCounter.Add(inbound.Source.Address.IP().String())
 				return nil
 			}
 
 			if err := task.Run(ctx, task.OnSuccess(postRequest, task.Close(serverWriter)), task.OnSuccess(getResponse, task.Close(writer))); err != nil {
 				common.Interrupt(serverReader)
 				common.Interrupt(serverWriter)
+
 				return newError("fallback ends").Base(err).AtInfo()
 			}
 			return nil
@@ -439,7 +442,6 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	}
 	newError("received request for ", request.Destination()).AtInfo().WriteToLog(sid)
 
-	inbound := session.InboundFromContext(ctx)
 	if inbound == nil {
 		panic("no inbound metadata")
 	}
@@ -529,7 +531,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		if err != nil {
 			return newError("failed to transfer request payload").Base(err).AtInfo()
 		}
-
+		user.IpCounter.Add(inbound.Source.Address.IP().String())
 		return nil
 	}
 

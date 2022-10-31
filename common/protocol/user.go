@@ -3,7 +3,6 @@ package protocol
 import (
 	"fmt"
 	rateLimit "github.com/juju/ratelimit"
-	"strings"
 	"sync"
 	"time"
 )
@@ -31,7 +30,15 @@ func (u *User) ToMemoryUser() (*MemoryUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	ipCounter := new(IpCounter)
+
+	ipCounter := GetIPCounter(u.Email)
+	if ipCounter == nil {
+		ipCounter = &IpCounter{
+			IpTable: make(map[string]*ConnIP),
+			Email:   u.Email,
+		}
+		AddIp(u.Email, ipCounter)
+	}
 	return &MemoryUser{
 		Account:   account,
 		Email:     u.Email,
@@ -51,38 +58,40 @@ type MemoryUser struct {
 
 var buckets sync.Map
 
-var connectedIps sync.Map
+var connections sync.Map
 
-func AddIp(email string, ip string) {
-	c, ok := connectedIps.Load(email)
-	if ok {
-		counter := c.(*IpCounter)
-		counter.Add(ip)
+func AddIp(email string, ipCounter *IpCounter) {
+
+	connections.Store(email, ipCounter)
+	newError("AddIp() email:", email, " do not have counter pointer:", &ipCounter, " created one").WriteToLog()
+}
+func GetIPCounter(email string) *IpCounter {
+
+	if c, ok := connections.Load(email); ok {
+		return c.(*IpCounter)
 	} else {
-		counter := &IpCounter{}
-		counter.Add(ip)
+		return nil
 	}
 }
 
 func GetIPs(email string) []string {
 	var ips []string
-	connectedIps.Range(func(key, value interface{}) bool {
-		if strings.Contains(email, key.(string)) {
-			c := value.(*IpCounter)
-
-			for k, ip := range c.IpTable {
-				interval := time.Now().Unix() - ip.Time
-				//over 1 minutes not update ,will delete
-				if interval > 1*60 {
-					delete(c.IpTable, k)
-				} else {
-					ips = append(ips, k)
-				}
+	if connection, ok := connections.Load(email); ok {
+		c := connection.(*IpCounter)
+		//newError("GetIPs() email:", email, " have ", len(c.IpTable), " connections, connected ips:", c.IpTable, " counter pointer:", &c).WriteToLog()
+		for k, ip := range c.IpTable {
+			interval := time.Now().Unix() - ip.Time
+			//over 1 minutes not update ,will delete
+			if interval > 1*60 {
+				newError("GetIPs() email:", email, " IP:", ip.IP, " over 30 seconds not updated,delete.").WriteToLog()
+				c.Del(ip.IP)
+			} else {
+				ips = append(ips, k)
 			}
-
 		}
-		return true
-	})
+	} else {
+		newError("GetIPs() email:", email, " do not have ip connected", email).WriteToLog()
+	}
 	return ips
 }
 

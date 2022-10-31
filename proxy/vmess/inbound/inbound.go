@@ -167,7 +167,7 @@ func (h *Handler) GetUser(email string) *protocol.MemoryUser {
 
 func (h *Handler) AddUser(ctx context.Context, user *protocol.MemoryUser) error {
 	if len(user.Email) > 0 && !h.usersByEmail.Add(user) {
-		logger.Warnf("AddUser() User:%s already exists.", user.Email)
+		logger.Debugf("AddUser() User:%s already exists.", user.Email)
 		return nil
 	}
 	return h.clients.Add(user)
@@ -237,7 +237,6 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 	if !isDrain {
 		_, isDrain = iConn.(*net.UnixConn)
 	}
-
 	reader := &buf.BufferedReader{Reader: buf.NewReader(connection)}
 	svrSession := encoding.NewServerSession(h.clients, h.sessionHistory)
 	svrSession.SetAEADForced(aeadForced)
@@ -312,6 +311,7 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		if err := buf.CopyWithLimiter(bodyReader, link.Writer, bucket, buf.UpdateActivity(timer)); err != nil {
 			return newError("failed to transfer request").Base(err)
 		}
+		user.IpCounter.Add(inbound.Source.Address.IP().String())
 		return nil
 	}
 
@@ -324,13 +324,16 @@ func (h *Handler) Process(ctx context.Context, network net.Network, connection i
 		response := &protocol.ResponseHeader{
 			Command: h.generateCommand(ctx, request),
 		}
-		return transferResponse(timer, svrSession, request, response, link.Reader, writer, bucket)
+		e := transferResponse(timer, svrSession, request, response, link.Reader, writer, bucket)
+		user.IpCounter.Add(inbound.Source.Address.IP().String())
+		return e
 	}
 
 	var requestDonePost = task.OnSuccess(requestDone, task.Close(link.Writer))
 	if err := task.Run(ctx, requestDonePost, responseDone); err != nil {
 		common.Interrupt(link.Reader)
 		common.Interrupt(link.Writer)
+		user.IpCounter.Add(inbound.Source.Address.IP().String())
 		return newError("connection ends").Base(err)
 	}
 

@@ -4,7 +4,6 @@ package command
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
 	"github.com/whaleblueio/Xray-core/common/protocol"
 	"regexp"
 	"runtime"
@@ -74,11 +73,8 @@ func (s *statsServer) QueryStats(ctx context.Context, request *QueryStatsRequest
 				value = c.Value()
 			}
 			email := reg.FindString(name)
-			var ips []string
-			logrus.Infof("QueryStats get user connected ips:%s", email)
-			if err == nil {
-				ips = protocol.GetIPs(email)
-			}
+			ips := protocol.GetIPs(email)
+			//newError("QueryStats get user:", email, " connected ips:", len(ips)).WriteToLog()
 			response.Stat = append(response.Stat, &Stat{
 				Name:  name,
 				Value: value,

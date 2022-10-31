@@ -274,7 +274,7 @@ func (s *Server) Process(ctx context.Context, network net.Network, conn internet
 		Reason: "",
 		Email:  user.Email,
 	})
-	protocol.AddIp(user.Email, conn.RemoteAddr().String())
+
 	newError("received request for ", destination).WriteToLog(sid)
 	return s.handleConnection(ctx, sessionPolicy, destination, clientReader, buf.NewWriter(conn), dispatcher, iConn, rawConn, statConn)
 }
