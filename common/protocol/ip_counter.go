@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"bytes"
 	"sync"
 	"time"
 )
@@ -52,4 +53,12 @@ func (c *IpCounter) getIP(ip string) *ConnIP {
 		return IPCon
 	}
 	return nil
+}
+
+func (c *IpCounter) PrintIP() string {
+	var ipStr bytes.Buffer
+	for s, _ := range c.IpTable {
+		ipStr.WriteString(s)
+	}
+	return ipStr.String()
 }
